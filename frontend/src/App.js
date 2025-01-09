@@ -2,41 +2,66 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-
 import Navbar from './components/Layout/Navbar';
 import Footer from './components/Layout/Footer';
+
+// Importy do route guards
+import PrivateRoute from './routes/PrivateRoute';
+import AdminRoute from './routes/AdminRoute';
+import TrainerRoute from './routes/TrainerRoute';
+
+// Importy paneli
+import AdminPanel from './components/AdminPanel';
+import TrainerPanel from './components/TrainerPanel';
+
+// Inne importy (Home, Login, Register, Dashboard, itp.)
 import Home from './components/Home';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Dashboard from './components/Dashboard';
-import ClassesList from './components/Classes/ClassesList';
-import ClassDetails from './components/Classes/ClassDetails';
-import MembershipPlans from './components/Memberships/MembershipPlans';
-import MyMemberships from './components/Memberships/MyMemberships';
-import TrainersList from './components/Trainers/TrainersList';
 
 function App() {
   return (
     <div>
       <Navbar />
-      <div style={{ padding: '1rem' }}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        
+        {/* Dostęp publiczny do logowania/rejestracji */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-          <Route path="/classes" element={<ClassesList />} />
-          <Route path="/classes/:id" element={<ClassDetails />} />
+        {/* Tylko zalogowani */}
+        <Route 
+          path="/dashboard" 
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          } 
+        />
 
-          <Route path="/memberships" element={<MembershipPlans />} />
-          <Route path="/memberships/my" element={<MyMemberships />} />
+        {/* Panel admina */}
+        <Route
+          path="/admin-panel"
+          element={
+            <AdminRoute>
+              <AdminPanel />
+            </AdminRoute>
+          }
+        />
 
-          <Route path="/trainers" element={<TrainersList />} />
+        {/* Panel trenera */}
+        <Route
+          path="/trainer-panel"
+          element={
+            <TrainerRoute>
+              <TrainerPanel />
+            </TrainerRoute>
+          }
+        />
 
-          {/* ...inne trasy */}
-        </Routes>
-      </div>
+      </Routes>
       <Footer />
     </div>
   );

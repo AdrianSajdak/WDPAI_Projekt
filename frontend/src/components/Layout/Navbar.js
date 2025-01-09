@@ -17,13 +17,16 @@ function Navbar() {
     <nav style={{ backgroundColor: '#eee', padding: '1rem' }}>
       <ul style={{ display: 'flex', gap: '1rem', listStyle: 'none', margin: 0 }}>
         <li><Link to="/">Strona główna</Link></li>
-        <li><Link to="/classes">Zajęcia</Link></li>
-        <li><Link to="/memberships">Członkostwa</Link></li>
-        <li><Link to="/trainers">Trenerzy</Link></li>
         {user ? (
           <>
             <li><Link to="/dashboard">Panel użytkownika</Link></li>
-            <li><button onClick={handleLogout}>Wyloguj</button></li>
+            {user.is_superuser && (
+              <li><Link to="/admin-panel">Panel admina</Link></li>
+            )}
+            {(user.is_trainer || user.is_superuser) && (
+              <li><Link to="/trainer-panel">Panel trenera</Link></li>
+            )}
+            <li><button onClick={logout}>Wyloguj</button></li>
           </>
         ) : (
           <>

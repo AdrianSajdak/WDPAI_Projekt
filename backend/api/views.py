@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
-from .models import MembershipPlan, Membership, GroupClass, Trainer
+from .permissions import AdminRequired, TrainerRequired
+from .models import CustomUser, MembershipPlan, Membership, GroupClass, Trainer
 from .serializers import (
     CustomUserSerializer,
     MembershipPlanSerializer,
@@ -64,20 +65,29 @@ def google_login(request):
 class MembershipPlanViewSet(viewsets.ModelViewSet):
     queryset = MembershipPlan.objects.all()
     serializer_class = MembershipPlanSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
+    # Tylko admin może tworzyć/edytować
+    permission_classes = [AdminRequired]
 # ----------------------
 #   MEMBERSHIP
 # ----------------------
 class MembershipViewSet(viewsets.ModelViewSet):
     queryset = Membership.objects.all()
     serializer_class = MembershipSerializer
-    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        # Tylko admin może tworzyć i usuwać membershipy.
+        # Zwykły user może "zobaczyć" swoje membershipy?
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [AdminRequired()]
+        else:
+            return [permissions.IsAuthenticated()]
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
+        user = self.request.user
+        if user.is_superuser:
             return Membership.objects.all()
-        return Membership.objects.filter(user=self.request.user)
+        # Zwykły user → widzi tylko swoje
+        return Membership.objects.filter(user=user)
 
 # ----------------------
 #   CLASSES
@@ -85,7 +95,17 @@ class MembershipViewSet(viewsets.ModelViewSet):
 class GroupClassViewSet(viewsets.ModelViewSet):
     queryset = GroupClass.objects.all()
     serializer_class = GroupClassSerializer
+    # Domyślnie widoczne dla zalogowanych, a zapisy przy join/leave
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [TrainerRequired()]  # Tylko trener (lub admin)
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        # Ustawiamy, że autorem zajęć jest zalogowany trener
+        serializer.save(trainer=self.request.user)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def join(self, request, pk=None):
@@ -111,7 +131,13 @@ class GroupClassViewSet(viewsets.ModelViewSet):
 class TrainerViewSet(viewsets.ModelViewSet):
     queryset = Trainer.objects.all()
     serializer_class = TrainerSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # Tylko admin może tworzyć/edytować trainerów
+    permission_classes = [AdminRequired]
 
+    # ewentualnie: read-only dla innych:
+    # def get_permissions(self):
+    #     if self.action in ['list', 'retrieve']:
+    #         return [permissions.AllowAny()]
+    #     return [AdminRequired()]
     def perform_create(self, serializer):
         return serializer.save()

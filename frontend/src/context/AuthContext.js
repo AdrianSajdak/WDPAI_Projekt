@@ -20,7 +20,10 @@ export const AuthProvider = ({ children }) => {
           // Token wygasł
           logout();
         } else {
-          setUser(decoded); // ewentualnie można pobrać /api/me/ z backendu
+          //Ewentualnie const meResponse = await axiosClient.get('/me/'); 
+          //który zwróci {username, is_superuser, is_trainer, ...}
+          //setUser(meResponse.data);
+          setUser(decoded); 
         }
       } catch (err) {
         console.error(err);
