@@ -141,3 +141,10 @@ class TrainerViewSet(viewsets.ModelViewSet):
     #     return [AdminRequired()]
     def perform_create(self, serializer):
         return serializer.save()
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_current_user(request):
+    user = request.user
+    serializer = CustomUserSerializer(user)  # Twój serializer, który zwraca {id, username, email, is_trainer, is_superuser, ...}
+    return Response(serializer.data, status=200)

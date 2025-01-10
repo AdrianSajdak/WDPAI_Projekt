@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     RegisterUserView, google_login,
     MembershipPlanViewSet, MembershipViewSet,
-    GroupClassViewSet, TrainerViewSet
+    GroupClassViewSet, TrainerViewSet, get_current_user
 )
 
 router = DefaultRouter()
@@ -18,4 +18,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('register/', RegisterUserView.as_view(), name='register'),
     path('google-login/', google_login, name='google-login'),
+    path('me/', get_current_user, name='me'),
 ]
