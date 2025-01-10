@@ -1,0 +1,47 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.swp
+*~
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Django
+*.sqlite3
+db.sqlite3
+/media/
+staticfiles/
+static/
+
+# Environment files
+.env
+.env.*
+
+# Logs and debug output
+*.log
+*.out
+*.err
+
+# Migrations
+*/migrations/__pycache__/
+*/migrations/*.pyc
+*/migrations/*.pyo
+*/migrations/*.swp
+*/migrations/*~
+*/migrations/*.log
+
+.coverage
+.tox/
+.hypothesis/
+*.cover
+
+.idea/
+.vscode/
+*.iml
+
+.DS_Store
