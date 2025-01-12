@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../../api/axiosClient';
+import '../styles/App.css';
 
 function MyMemberships() {
   const [myMemberships, setMyMemberships] = useState([]);

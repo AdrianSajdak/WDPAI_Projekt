@@ -3,6 +3,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import '../styles/App.css';
 
 function Dashboard() {
   const { user } = useAuth();
