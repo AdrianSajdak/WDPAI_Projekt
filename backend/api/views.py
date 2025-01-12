@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
+from rest_framework.permissions import IsAuthenticated
 
 from .permissions import AdminRequired, TrainerRequired
 from .models import CustomUser, MembershipPlan, Membership, GroupClass, Trainer
