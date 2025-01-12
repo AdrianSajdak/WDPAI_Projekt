@@ -3,6 +3,8 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
+import '../../styles/App.css';
+import '../../styles/Home.css';
 
 function Navbar() {
   const { user, logout } = useAuth();
@@ -14,8 +16,8 @@ function Navbar() {
   };
 
   return (
-    <nav style={{ backgroundColor: '#eee', padding: '1rem' }}>
-      <ul style={{ display: 'flex', gap: '1rem', listStyle: 'none', margin: 0 }}>
+    <nav className='navbar'>
+      <ul>
         <li><Link to="/">Strona główna</Link></li>
         {user ? (
           <>

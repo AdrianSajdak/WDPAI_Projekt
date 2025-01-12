@@ -1,114 +1,152 @@
-/* styles/App.css */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Nunito';
+  background-color: #f7f9fc;
+  color: #333;
+  box-sizing: border-box;
+}
 
-/* Opcjonalnie można zaimportować font z Google Fonts:
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
-*/
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
 
-html, body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Open Sans', sans-serif;
-    background-color: #f7f9fc;
-    color: #333;
-    box-sizing: border-box;
-  }
-  
-  *, *::before, *::after {
-    box-sizing: inherit;
-  }
-  
-  /* Podstawowy layout */
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem;
-  }
-  
-  /* Nagłówki */
-  h1, h2, h3, h4, h5, h6 {
-    color: #20232a;
-    margin: 0.5rem 0;
-    font-weight: 600;
-  }
-  
-  /* Paragrafy */
-  p {
-    margin: 0.5rem 0;
-    line-height: 1.6;
-  }
-  
-  /* Listy */
-  ul {
-    margin: 0.5rem 0 1rem;
-    padding-left: 1.5rem;
-  }
-  li {
-    margin-bottom: 0.25rem;
-  }
-  
-  /* Linki */
-  a {
-    color: #61dafb;
-    text-decoration: none;
-    transition: color 0.2s ease-in-out;
-  }
-  a:hover {
-    color: #408fb5;
-  }
-  
-  /* Przycisk */
-  button {
-    background-color: #61dafb;
-    color: #20232a;
-    border: none;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    margin-right: 0.5rem;
-    font-family: inherit;
-    font-size: 1rem;
-    border-radius: 4px;
-    transition: background-color 0.25s ease-in-out;
-  }
-  button:hover {
-    background-color: #58c3e2;
-  }
-  
-  /* Nawigacja (Navbar) */
-  nav {
-    background-color: #20232a;
-    padding: 1rem;
-  }
-  nav ul {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  nav li {
-    margin-right: 1rem;
-  }
-  nav li a {
-    color: #fff;  /* białe linki w navbarze */
-    font-weight: 600;
-  }
-  
-  /* Stopka (Footer) */
-  footer {
-    margin-top: 2rem;
-    text-align: center;
-    padding: 1rem;
-    background-color: #f2f2f2;
-    color: #666;
-  }
-  
-  /* Drobne utility classes */
-  .text-center {
-    text-align: center;
-  }
-  .mt-2 {
-    margin-top: 2rem;
-  }
-  .mb-2 {
-    margin-bottom: 2rem;
-  }
-  
+button {
+  background-color: #B3E4A8;
+  color: #20232a;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: 4px;
+  transition: background-color 0.25s ease-in-out;
+}
+
+button:hover {
+  background-color: #9cd08e;
+  /* ciemniejsza zieleń na hover */
+}
+
+.btn-green {
+  width: auto;
+  height: 55px;
+  flex-shrink: 0;
+  background-color: #B3E4A8;
+  color: #000;
+  text-align: center;
+  font-family: Nunito;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-transform: capitalize;
+  border-radius: 10px;
+  box-shadow: -2px 2px 50px 0px rgba(0, 0, 0, 0.05);
+
+}
+
+.btn-green:hover {
+  background-color: #9cd08e;
+}
+
+.centered-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  /* żeby zawartość była wyśrodkowana pionowo */
+  padding: 2rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="checkbox"] {
+  margin: 0.25rem 0 0.5rem 0;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem;
+  width: 100%;
+  max-width: 300px;
+}
+
+input[type="checkbox"] {
+  accent-color: #B3E4A8;
+  /* w nowszych przeglądarkach */
+}
+
+.navbar {
+  border: 1px solid #000;
+  background: #1C1C1C;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  height: 97px;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.navbar ul {
+  display: flex;
+  text-decoration: none;
+  list-style: none;
+}
+
+.navbar li {
+  color: #FFF;
+  text-align: center;
+  font-family: Nunito;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-transform: capitalize;
+  text-decoration: none;
+  margin-top: auto;
+  margin-right: auto;
+
+}
+
+.navbar a,
+.navbar button {
+  color: #FFF;
+  text-align: center;
+  font-family: Nunito;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-transform: capitalize;
+  text-decoration: none;
+  display: flex;
+  justify-content: space-between;
+}
+
+.navbar button:hover,
+.navbar a:hover {
+  background-color: #333;
+}
+
+.footer {
+  background: rgba(222, 222, 222, 0.42);
+}
+
+.footer p {
+  color: #000;
+  text-align: center;
+  font-family: Nunito;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-transform: capitalize;
+}
