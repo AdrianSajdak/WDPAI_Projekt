@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 
 import '../../styles/Login.css';
+import '../../styles/App.css';
 
 import logo from '../../images/logo.png'
 

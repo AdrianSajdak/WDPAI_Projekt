@@ -5,6 +5,7 @@ import axiosClient from '../../api/axiosClient';
 
 
 import '../../styles/Register.css';
+import '../../styles/App.css';
 
 import logo from '../../images/logo.png'
 
