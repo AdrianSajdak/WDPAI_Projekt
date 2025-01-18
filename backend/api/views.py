@@ -89,6 +89,9 @@ class MembershipViewSet(viewsets.ModelViewSet):
             return Membership.objects.all()
         # Zwykły user → widzi tylko swoje
         return Membership.objects.filter(user=user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 # ----------------------
 #   CLASSES

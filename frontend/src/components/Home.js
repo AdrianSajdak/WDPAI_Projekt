@@ -1,35 +1,44 @@
-// src/components/Home.js
-
-import React from 'react';
-import { Link } from 'react-router-dom';
-import '../styles/Home.css';
-import logo from '../images/logo.png';
-import '../styles/App.css';
+import React, { useEffect, useState } from 'react';
+import axiosClient from '../api/axiosClient';
 
 function Home() {
+  const [plans, setPlans] = useState([]);
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
+  const fetchPlans = async () => {
+    try {
+      // GET /membership-plans/ (nie wymaga zalogowania, jeśli tak skonfigurowałeś)
+      const res = await axiosClient.get('/membership-plans/');
+      setPlans(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
-    <div className="home-container">
-      <div className="home-content">
+    <div>
+      <h1>Witaj w GymManagement!</h1>
+      <p>Platforma do zarządzania siłownią i zajęciami grupowymi.</p>
 
-
-        <h1 className="home-title">Witaj w GymManagement!</h1>
-        <p className="home-subtitle">
-          Platforma do zarządzania siłownią i zajęciami grupowymi
-        </p>
-
-        <div className="home-buttons">
-          <Link to="/classes" className="btn-green">
-            Sprawdź Zajęcia
-          </Link>
-          <div className="home-logo">
-            <img src={logo} alt="logo" />
-
-          </div>
-          <Link to="/memberships" className="btn-green">
-            Zobacz Plany Członkostw
-          </Link>
-        </div>
-      </div>
+      <section style={{ marginTop: '2rem' }}>
+        <h2>Dostępne plany członkowskie</h2>
+        {plans.length === 0 ? (
+          <p>Brak planów.</p>
+        ) : (
+          <ul>
+            {plans.map(p => (
+              <li key={p.id}>
+                <strong>{p.name}</strong> - {p.price} PLN (ważne {p.duration_days} dni)
+                <br />
+                {p.description}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

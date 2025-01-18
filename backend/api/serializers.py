@@ -32,14 +32,9 @@ class MembershipSerializer(serializers.ModelSerializer):
 #   Classes
 # ----------------------
 class GroupClassSerializer(serializers.ModelSerializer):
-    attendees = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=CustomUser.objects.all(),
-        required=False
-    )
     class Meta:
         model = GroupClass
-        fields = '__all__'
+        fields = '_all_'  # w tym: name, description, start_time, end_time, capacity, class_type, trainer, attendees
 
 # ----------------------
 #   Trainer

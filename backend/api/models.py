@@ -29,23 +29,28 @@ class Membership(models.Model):
         return f"{self.user.username} - {self.plan.name}"
 
 class GroupClass(models.Model):
+    CLASS_TYPES = [
+        ('group', 'Grupowe'),
+        ('individual', 'Indywidualne'),
+    ]
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     capacity = models.PositiveIntegerField(default=10)
-    # Dodajemy pole trainer → powiązane z userem, o ile user.is_trainer = True
+    class_type = models.CharField(max_length=20, choices=CLASS_TYPES, default='group')
+
     trainer = models.ForeignKey(
-        CustomUser, 
-        on_delete=models.SET_NULL, 
-        null=True, 
-        blank=True, 
+        'api.CustomUser',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='classes_created'
     )
-    attendees = models.ManyToManyField(CustomUser, blank=True, related_name='classes_joined')
+    attendees = models.ManyToManyField('api.CustomUser', blank=True, related_name='classes_joined')
 
     def __str__(self):
-        return f"{self.name} ({self.start_time} - {self.end_time})"
+        return f"{self.name} ({self.class_type})"
 
 class Trainer(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='trainer_profile')

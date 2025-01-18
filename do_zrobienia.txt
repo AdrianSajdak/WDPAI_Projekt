@@ -15,8 +15,6 @@ i wyglądały jak te z css
 footer przykleic do dołu strony
 
 
-jakis wybór członkostwa dla użytkownika
-
 
 na stronie głownej przekierowanie do zobacz plany członkostw
 i tam mają się wyświetlać te plany
@@ -24,3 +22,15 @@ i tam mają się wyświetlać te plany
 ??????????
 django.db.utils.ProgrammingError: column api_groupclass.trainer_id does not exis
 ???????????
+
+
+
+handlePurchase do poprawy bo aktualnie nie działa poprawnie
+
+nie działa admin-panel
+
+nie działa dodawanie zajec przez admina [jak indywidualne to trener wybiera użytkownika zamiast liczbę użytkowników]
+
+trzeba poprawić css wyśrodkować wszystko
+
+w panelu uyżytkownika mają się też wyświetlać zajecia tego użytkownika np
