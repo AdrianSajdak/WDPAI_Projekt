@@ -1,67 +1,95 @@
-// src/App.js
-
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Layout/Navbar';
 import Footer from './components/Layout/Footer';
 
-// Importy do route guards
+// Route guards
 import PrivateRoute from './routes/PrivateRoute';
 import AdminRoute from './routes/AdminRoute';
 import TrainerRoute from './routes/TrainerRoute';
 
-// Importy paneli
-import AdminPanel from './components/AdminPanel';
-import TrainerPanel from './components/TrainerPanel';
-
-// Inne importy (Home, Login, Register, Dashboard, itp.)
+// Pages & panels
 import Home from './components/Home';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Dashboard from './components/Dashboard';
+import AdminPanel from './components/AdminPanel';
+import TrainerPanel from './components/TrainerPanel';
+import AllClasses from './components/Classes/AllClasses';  
+import MyClasses from './components/Classes/MyClasses';    
+import MembershipPlans from './components/Memberships/MembershipPlans';
 
 function App() {
   return (
-    <div>
+    <div id="root">
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        
-        {/* Dostęp publiczny do logowania/rejestracji */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+      {/* main-content ensures the footer is pushed down */}
+      <div className="main-content">
+        <Routes>
+          <Route path="/" element={<Home />} />
 
-        {/* Tylko zalogowani */}
-        <Route 
-          path="/dashboard" 
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          } 
-        />
+          {/* Public routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-        {/* Panel admina */}
-        <Route
-          path="/admin-panel"
-          element={
-            <AdminRoute>
-              <AdminPanel />
-            </AdminRoute>
-          }
-        />
+          {/* Protected routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/my-classes"
+            element={
+              <PrivateRoute>
+                <MyClasses />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/all-classes"
+            element={
+              <PrivateRoute>
+                <AllClasses />
+              </PrivateRoute>
+            }
+          />
 
-        {/* Panel trenera */}
-        <Route
-          path="/trainer-panel"
-          element={
-            <TrainerRoute>
-              <TrainerPanel />
-            </TrainerRoute>
-          }
-        />
+          {/* Admin route */}
+          <Route
+            path="/admin-panel"
+            element={
+              <AdminRoute>
+                <AdminPanel />
+              </AdminRoute>
+            }
+          />
 
-      </Routes>
+          {/* Trainer route */}
+          <Route
+            path="/trainer-panel"
+            element={
+              <TrainerRoute>
+                <TrainerPanel />
+              </TrainerRoute>
+            }
+          />
+
+
+          <Route
+            path="/membership-plans"
+            element={
+              <PrivateRoute>
+                <MembershipPlans />
+              </PrivateRoute>
+            }
+          />
+
+        </Routes>
+      </div>
       <Footer />
     </div>
   );

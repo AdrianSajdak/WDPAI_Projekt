@@ -1,4 +1,3 @@
-// src/hooks/useAuth.js
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
@@ -10,11 +9,11 @@ export default function useAuth() {
     logout,
     googleLogin,
     loading,
-    error
+    error,
   } = useContext(AuthContext);
 
-  // Możesz tu zdefiniować wygodne gettery:
-  const isAuthenticated = !!user; 
+  // Convenient boolean getters
+  const isAuthenticated = !!user;
   const isAdmin = !!(user && user.is_superuser);
   const isTrainer = !!(user && user.is_trainer);
 

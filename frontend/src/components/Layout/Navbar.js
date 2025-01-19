@@ -1,10 +1,6 @@
-// src/components/Layout/Navbar.js
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
-import '../../styles/App.css';
-import '../../styles/Home.css';
 
 function Navbar() {
   const { user, logout } = useAuth();
@@ -16,24 +12,38 @@ function Navbar() {
   };
 
   return (
-    <nav className='navbar'>
+    <nav className="navbar">
       <ul>
-        <li><Link to="/">Strona główna</Link></li>
+        <li>
+          <Link to="/">Home</Link>
+        </li>
         {user ? (
           <>
-            <li><Link to="/dashboard">Panel użytkownika</Link></li>
+            <li>
+              <Link to="/dashboard">User Panel</Link>
+            </li>
             {user.is_superuser && (
-              <li><Link to="/admin-panel">Panel admina</Link></li>
+              <li>
+                <Link to="/admin-panel">Admin Panel</Link>
+              </li>
             )}
             {(user.is_trainer || user.is_superuser) && (
-              <li><Link to="/trainer-panel">Panel trenera</Link></li>
+              <li>
+                <Link to="/trainer-panel">Trainer Panel</Link>
+              </li>
             )}
-            <li><button onClick={logout}>Wyloguj</button></li>
+            <li>
+              <button onClick={handleLogout}>Log out</button>
+            </li>
           </>
         ) : (
           <>
-            <li><Link to="/login">Zaloguj</Link></li>
-            <li><Link to="/register">Rejestracja</Link></li>
+            <li>
+              <Link to="/login">Log in</Link>
+            </li>
+            <li>
+              <Link to="/register">Register</Link>
+            </li>
           </>
         )}
       </ul>

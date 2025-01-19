@@ -1,36 +1,19 @@
-CSS dla Panel użytkownika
 
 
-W panelu trenera trzeba dodać jakiegoś formsa
-zeby mógł np tworzyć zajęcia grupowe lub nwm indywidualne
 
-panel administratora jakis do dodawania członkostw itd 
 
-css do tego
 
 figme przerobić zeby były wszystkie strony
 i wyglądały jak te z css
 
 
-footer przykleic do dołu strony
+footer przykleic do dołu strony na każdej stronie
 
-
-
-na stronie głownej przekierowanie do zobacz plany członkostw
-i tam mają się wyświetlać te plany
-
-??????????
-django.db.utils.ProgrammingError: column api_groupclass.trainer_id does not exis
-???????????
-
-
-
-handlePurchase do poprawy bo aktualnie nie działa poprawnie
 
 nie działa admin-panel
+panel administratora jakis do dodawania członkostw itd 
 
-nie działa dodawanie zajec przez admina [jak indywidualne to trener wybiera użytkownika zamiast liczbę użytkowników]
 
-trzeba poprawić css wyśrodkować wszystko
+użytkownik (nie trener musi miec jakąs zakłądkę memberships gdzie może wybrac membership ze wszysktich dostęnych i go "kupic")
 
-w panelu uyżytkownika mają się też wyświetlać zajecia tego użytkownika np
+

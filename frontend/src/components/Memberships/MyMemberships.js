@@ -1,8 +1,6 @@
-// src/components/Memberships/MyMemberships.js
-
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../../api/axiosClient';
-import '../styles/App.css';
+import '../../styles/App.css';
 
 function MyMemberships() {
   const [myMemberships, setMyMemberships] = useState([]);
@@ -15,7 +13,7 @@ function MyMemberships() {
         setMyMemberships(response.data);
       } catch (err) {
         console.error(err);
-        setError('Nie udało się pobrać Twoich członkostw.');
+        setError('Could not fetch your memberships.');
       }
     };
     fetchMemberships();
@@ -23,16 +21,26 @@ function MyMemberships() {
 
   return (
     <div>
-      <h2>Moje członkostwa</h2>
-      {error && <p style={{color: 'red'}}>{error}</p>}
+      <h2>My Memberships</h2>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       {myMemberships.length === 0 ? (
-        <p>Brak członkostw.</p>
+        <p>You have no memberships.</p>
       ) : (
         <ul>
           {myMemberships.map((m) => (
             <li key={m.id}>
-              <strong>Plan:</strong> {m.plan} {/* lub m.plan.name */}
-              <p>Od: {m.start_date} &nbsp;|&nbsp; Do: {m.end_date}</p>
+              {/* If your backend returns nested plan objects, use m.plan.name */}
+              <strong>Plan ID:</strong> {m.plan}
+              <p>
+                From: {m.start_date} &nbsp;|&nbsp; To: {m.end_date}
+              </p>
+              <p>
+                {m.is_active ? (
+                  <span style={{ color: 'green' }}>Active</span>
+                ) : (
+                  <span style={{ color: 'red' }}>Inactive</span>
+                )}
+              </p>
             </li>
           ))}
         </ul>

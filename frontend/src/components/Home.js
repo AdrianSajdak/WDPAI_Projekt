@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../api/axiosClient';
+import '../styles/Home.css';
 
 function Home() {
   const [plans, setPlans] = useState([]);
@@ -10,7 +11,6 @@ function Home() {
 
   const fetchPlans = async () => {
     try {
-      // GET /membership-plans/ (nie wymaga zalogowania, jeśli tak skonfigurowałeś)
       const res = await axiosClient.get('/membership-plans/');
       setPlans(res.data);
     } catch (err) {
@@ -19,26 +19,31 @@ function Home() {
   };
 
   return (
-    <div>
-      <h1>Witaj w GymManagement!</h1>
-      <p>Platforma do zarządzania siłownią i zajęciami grupowymi.</p>
+    <div className="home-container">
+      <div className="home-content">
+        <h1 className="home-title">Welcome to GymManagement!</h1>
+        <p className="home-subtitle">
+          The platform for managing gym memberships and group classes.
+        </p>
 
-      <section style={{ marginTop: '2rem' }}>
-        <h2>Dostępne plany członkowskie</h2>
-        {plans.length === 0 ? (
-          <p>Brak planów.</p>
-        ) : (
-          <ul>
-            {plans.map(p => (
-              <li key={p.id}>
-                <strong>{p.name}</strong> - {p.price} PLN (ważne {p.duration_days} dni)
-                <br />
-                {p.description}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+        <section style={{ marginTop: '2rem' }}>
+          <h2>Available Membership Plans</h2>
+          {plans.length === 0 ? (
+            <p>No plans available.</p>
+          ) : (
+            <ul style={{ listStyle: 'none', padding: 0 }}>
+              {plans.map((p) => (
+                <li key={p.id} style={{ margin: '1rem 0' }}>
+                  <strong>{p.name}</strong> – {p.price} PLN (
+                  {p.duration_days} days)
+                  <br />
+                  {p.description}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

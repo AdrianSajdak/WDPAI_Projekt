@@ -1,3 +1,6 @@
+/* ----------------------------
+   GLOBAL RESETS / BASE STYLES
+----------------------------- */
 html,
 body {
   margin: 0;
@@ -6,6 +9,7 @@ body {
   background-color: #f7f9fc;
   color: #333;
   box-sizing: border-box;
+  height: 100%; /* crucial for sticky footer (flex container approach) */
 }
 
 *,
@@ -14,6 +18,24 @@ body {
   box-sizing: inherit;
 }
 
+/* #root as a flex container: 
+   We'll stretch it to fill 100% of viewport
+   so we can push the footer to the bottom */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* The main content flex:1 so the footer 
+   stays at the bottom */
+.main-content {
+  flex: 1 0 auto;
+  text-align: center; /* center text by default */
+  padding: 20px;
+}
+
+/* Buttons */
 button {
   background-color: #B3E4A8;
   color: #20232a;
@@ -26,12 +48,11 @@ button {
   border-radius: 4px;
   transition: background-color 0.25s ease-in-out;
 }
-
 button:hover {
-  background-color: #9cd08e;
-  /* ciemniejsza zieleń na hover */
+  background-color: #9cd08e; /* darker green on hover */
 }
 
+/* .btn-green style (for bigger green buttons) */
 .btn-green {
   width: auto;
   height: 55px;
@@ -39,7 +60,7 @@ button:hover {
   background-color: #B3E4A8;
   color: #000;
   text-align: center;
-  font-family: Nunito;
+  font-family: Nunito, sans-serif;
   font-size: 32px;
   font-style: normal;
   font-weight: 400;
@@ -47,23 +68,22 @@ button:hover {
   text-transform: capitalize;
   border-radius: 10px;
   box-shadow: -2px 2px 50px 0px rgba(0, 0, 0, 0.05);
-
 }
-
 .btn-green:hover {
   background-color: #9cd08e;
 }
 
+/* Center container utility */
 .centered-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  /* żeby zawartość była wyśrodkowana pionowo */
+  min-height: 100vh; /* full vertical center if needed */
   padding: 2rem;
 }
 
+/* Inputs */
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -83,78 +103,67 @@ input[type="password"] {
 
 input[type="checkbox"] {
   accent-color: #B3E4A8;
-  /* w nowszych przeglądarkach */
 }
 
+/* ------------------
+   NAVBAR
+-------------------*/
 .navbar {
   border: 1px solid #000;
   background: #1C1C1C;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   height: 97px;
-  flex-shrink: 0;
+  flex-shrink: 0; /* do not allow navbar to shrink */
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 1rem;
 }
-
 .navbar ul {
   margin: 0;
   padding: 0;
   display: flex;
-  direction: inherit;
-  justify-content: space-between;
   list-style: none;
-  text-decoration: none;
   text-align: center;
 }
-
-
 .navbar li {
   display: flex;
   align-items: center;
-
 }
-
 .navbar a,
 .navbar button {
   padding: 0.5rem 1rem;
-  /* Dodajemy padding w poziomie i pionie */
   background: none;
-  /* Domyślnie bez tła (zmieni się dopiero na hover) */
   border: none;
-  /* usuń obramowanie w <button> */
   color: #FFF;
-  text-align: center;
   font-family: 'Nunito';
   font-size: 24px;
-  font-style: normal;
   font-weight: 400;
-  line-height: normal;
   text-transform: capitalize;
   text-decoration: none;
   cursor: pointer;
   transition: background-color 0.25s ease-in-out;
 }
-
 .navbar button:hover,
 .navbar a:hover {
   background-color: #333;
 }
 
+/* ------------------
+   FOOTER
+-------------------*/
 .footer {
   background: rgba(222, 222, 222, 0.42);
   height: 97px;
-  flex-shrink: 0;
+  flex-shrink: 0; /* do not allow footer to shrink */
   text-align: center;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-
 .footer p {
   margin-top: 35px;
   color: #000;
-  text-align: center;
   font-family: 'Nunito';
   font-size: 20px;
   font-style: normal;
