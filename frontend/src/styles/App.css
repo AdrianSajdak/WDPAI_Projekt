@@ -24,13 +24,13 @@ body {
 #root {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  min-height: 100vh;
 }
 
 /* The main content flex:1 so the footer 
    stays at the bottom */
 .main-content {
-  flex: 1 0 auto;
+  flex: 1;
   text-align: center; /* center text by default */
   padding: 20px;
 }

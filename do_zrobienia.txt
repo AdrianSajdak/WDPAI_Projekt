@@ -1,19 +1,32 @@
 
-
-
-
-
 figme przerobić zeby były wszystkie strony
 i wyglądały jak te z css
 
+uzytkownik ma przycisk memberships ale nie moze zadnego kupic bo ich nie ma XD
 
-footer przykleic do dołu strony na każdej stronie
+Po stronie admin panel trzeba dodać zeby memberships nie byly zalezne od usera
+i zeby mozna bylo po prostu dodac plan i tyle bez wyboru usera 
+i zeby te plany to byly wpisywane pola i trzeba dodac cene i czas trwania i powinno to tak wygladac
 
+Create membership
 
-nie działa admin-panel
-panel administratora jakis do dodawania członkostw itd 
+Plan: nazwa wpisywana z klawiatury 
+Opis planu : jakis opis z klawiatury 
+Price : cena z klawiatury 
+Duration time: czas trwania Liczba dni 
 
+Trzeba jeszcze w admin panel dodac przycisk Add trainer i tam podac jakies dane trenera imie nazwisko i utworzyc 
+usera w bazie danych 
 
-użytkownik (nie trener musi miec jakąs zakłądkę memberships gdzie może wybrac membership ze wszysktich dostęnych i go "kupic")
+Dodatkowo w admin panel przyciski Existing Trainers,
+Membership plans i all classes musza byc klikalne i wyswietlac te rzeczy
 
+Jako user dolaczanie do klas i wychodzenie z nich dziala bardzo fajnie
+tylko trzeba tam dodac jakies info jaki trener imie nazwisko i godziny zeby lepiej sie wyswietlaly
+czytelniej
 
+I jak chce jako user wybrac memberships to mam do wyboru te kilka planow i potem wybieram sam sobie date
+rozpoczecia po kliknieciu w plan mam ten kalendarz i najlepiej zeby te plany byly tak ladnie wyswietlone
+a nie ze taka sucha lista pusta tylko najlepiej zeby byly duze i widoczne
+
+i trzeba zmienic to logowanie przez localstorage 

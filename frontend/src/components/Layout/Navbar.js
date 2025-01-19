@@ -32,6 +32,12 @@ function Navbar() {
                 <Link to="/trainer-panel">Trainer Panel</Link>
               </li>
             )}
+            {user && !user.is_trainer && !user.is_superuser && (
+              <li>
+                <Link to="/membership-plans">Memberships</Link>
+              </li>
+            )}
+
             <li>
               <button onClick={handleLogout}>Log out</button>
             </li>
