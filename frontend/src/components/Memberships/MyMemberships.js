@@ -16,8 +16,20 @@ function MyMemberships() {
         setError('Could not fetch your memberships.');
       }
     };
-    fetchMemberships();
+    if (user && !user.is_trainer) {
+      fetchMemberships();
+    }
   }, []);
+
+  if (user.is_trainer) {
+    // Tylko tekst
+    return (
+      <div>
+        <h2>My Memberships</h2>
+        <p>Trainer Membership</p>
+      </div>
+    );
+  }
 
   return (
     <div>

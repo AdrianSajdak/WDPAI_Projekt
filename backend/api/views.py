@@ -90,8 +90,12 @@ def google_login(request):
 class MembershipPlanViewSet(viewsets.ModelViewSet):
     queryset = MembershipPlan.objects.all()
     serializer_class = MembershipPlanSerializer
-    # Only admin can create/update/delete a plan
-    permission_classes = [AdminRequired]
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]  # lub [permissions.IsAuthenticatedOrReadOnly()]
+        else:
+            return [AdminRequired()]
 
 
 # -------------------------------------------------
@@ -102,13 +106,15 @@ class MembershipViewSet(viewsets.ModelViewSet):
     serializer_class = MembershipSerializer
 
     def get_permissions(self):
-        if self.action == 'create':
-            # Allow all authenticated users to buy
+        if self.action in ['create']:
             return [permissions.IsAuthenticated()]
-        elif self.action in ['update', 'partial_update', 'destroy']:
-            return [AdminRequired()]
+        elif self.action in ['list', 'retrieve']:
+        # Zezwól na list/retrieve zalogowanym (IsAuthenticated)
+            return [permissions.IsAuthenticated()]
         else:
-            return [permissions.IsAuthenticated()]
+        # update, partial_update, destroy => admin
+            return [AdminRequired()]
+
 
     def get_queryset(self):
         user = self.request.user
@@ -118,11 +124,6 @@ class MembershipViewSet(viewsets.ModelViewSet):
         return Membership.objects.filter(user=user)
 
     def perform_create(self, serializer):
-        """
-        If an admin is creating a membership, they can specify any user.
-        If a normal user (somehow) is creating - enforced by permissions check - 
-        it would default to them. (But effectively blocked by AdminRequired anyway.)
-        """
         if self.request.user.is_superuser:
             serializer.save()
         else:
@@ -187,6 +188,15 @@ class GroupClassViewSet(viewsets.ModelViewSet):
         group_class.attendees.remove(request.user)
         return Response({"detail": "You have left the class."}, status=status.HTTP_200_OK)
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # if user is trainer and instance.trainer == user, or user is superuser
+        if request.user.is_superuser or instance.trainer == request.user:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'detail': 'Not allowed'}, status=status.HTTP_403_FORBIDDEN)
+
 
 # -------------------------------------------------
 #  TRAINER
@@ -194,14 +204,9 @@ class GroupClassViewSet(viewsets.ModelViewSet):
 class TrainerViewSet(viewsets.ModelViewSet):
     queryset = Trainer.objects.all()
     serializer_class = TrainerSerializer
-    # Only admin can manage trainer objects (create/update/delete).
     permission_classes = [AdminRequired]
 
-    # Example of read-only for non-admins:
-    # def get_permissions(self):
-    #     if self.action in ['list', 'retrieve']:
-    #         return [permissions.AllowAny()]
-    #     return [AdminRequired()]
+    
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

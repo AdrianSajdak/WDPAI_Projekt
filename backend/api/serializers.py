@@ -64,27 +64,79 @@ class MembershipPlanSerializer(serializers.ModelSerializer):
 #  Membership
 # -------------------------------------------------
 class MembershipSerializer(serializers.ModelSerializer):
-    # is_active is read-only, derived from model property
-    is_active = serializers.ReadOnlyField()
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Membership
-        fields = ['id', 'user', 'plan', 'start_date', 'end_date', 'is_active']
+        fields = '__all__'
+
 
 
 # -------------------------------------------------
 #  Classes
 # -------------------------------------------------
 class GroupClassSerializer(serializers.ModelSerializer):
+    trainer = serializers.PrimaryKeyRelatedField(read_only=True)
+    trainer_name = serializers.SerializerMethodField()
+    start_local = serializers.SerializerMethodField()
+    end_local = serializers.SerializerMethodField()
+
     class Meta:
         model = GroupClass
-        fields = '__all__'
+        fields = [
+            'id', 'name', 'trainer', 'trainer_name', 'start_time', 'end_time', 'start_local', 'end_local', 'capacity', 'attendees'
+        ]
 
+    def get_trainer_name(self, obj):
+        if obj.trainer:
+            return f"{obj.trainer.first_name} {obj.trainer.last_name}"
+        return "No trainer"
+    
+    def get_start_local(self, obj):
+        # formatuj np. DD.MM.YYYY HH:MM
+        return obj.start_time.strftime("%d.%m.%Y %H:%M")
+
+    def get_end_local(self, obj):
+        return obj.end_time.strftime("%d.%m.%Y %H:%M")
 
 # -------------------------------------------------
 #  Trainer
 # -------------------------------------------------
 class TrainerSerializer(serializers.ModelSerializer):
+    first_name = serializers.ReadOnlyField(source='user.first_name')
+    last_name = serializers.ReadOnlyField(source='user.last_name')
+    email = serializers.ReadOnlyField(source='user.email')
+    specialization = serializers.CharField(required=False)
+    photo = serializers.ImageField(required=False)
+    
     class Meta:
         model = Trainer
-        fields = '__all__'
+        fields = ['id', 'first_name', 'last_name', 'email', 'specialization', 'photo']
+
+    def create(self, validated_data):
+        # Wyciągamy dane
+        first_name = validated_data.pop('first_name')
+        last_name = validated_data.pop('last_name')
+        email = validated_data.pop('email')
+        password = validated_data.pop('password', None)  # moze byc None
+
+        # Tworzymy usera
+        # username = np. email lub generujemy
+        username = email
+        user = CustomUser.objects.create(
+            username=username,
+            email=email,
+            first_name=first_name,
+            last_name=last_name
+        )
+        if password:
+            user.set_password(password)
+        else:
+            # jesli nie podano password – generujemy random
+            from django.contrib.auth.hashers import make_password
+            user.password = make_password(CustomUser.objects.make_random_password())
+        user.save()
+
+        # Tworzymy obiekt Trainer
+        trainer = Trainer.objects.create(user=user, **validated_data)
+        return trainer

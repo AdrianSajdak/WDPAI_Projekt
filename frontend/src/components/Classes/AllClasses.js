@@ -50,24 +50,29 @@ function AllClasses() {
         <p>No classes available.</p>
       ) : (
         <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-          {classesList.map((c) => {
-            const freeSpots = c.capacity - (c.attendees?.length || 0);
-            const isJoined = c.attendees?.includes(user.id);
+          {classesList.map((gc) => {
+            const freeSpots = gc.capacity - (gc.attendees?.length || 0);
+            // sprawdzamy, czy user jest w gc.attendees
+            const isJoined = user && gc.attendees?.includes(user.id);
 
             return (
-              <li key={c.id} style={{ margin: '1rem 0' }}>
-                <strong>{c.name}</strong> — {c.description}
+              <li key={gc.id} style={{ marginBottom: '1rem' }}>
+                <strong>{gc.name}</strong>
                 <br />
-                {c.start_time} – {c.end_time}
+                Trainer: {gc.trainer_name}
                 <br />
-                Spots: {freeSpots} / {c.capacity}
-                <div style={{ marginTop: '0.5rem' }}>
-                  {isJoined ? (
-                    <button onClick={() => handleLeave(c.id)}>Leave</button>
+                {gc.start_local} – {gc.end_local}
+                <br />
+                Spots: {freeSpots} / {gc.capacity}
+                <br />
+                {/* Przyciski join/leave tylko jeśli user zalogowany */}
+                {user && !user.is_trainer &&(
+                  isJoined ? (
+                    <button onClick={() => handleLeave(gc.id)}>Leave</button>
                   ) : (
-                    <button onClick={() => handleJoin(c.id)}>Join</button>
-                  )}
-                </div>
+                    <button onClick={() => handleJoin(gc.id)}>Join</button>
+                  )
+                )}
               </li>
             );
           })}

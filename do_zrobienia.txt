@@ -1,32 +1,20 @@
-
+LAYOUT:
 figme przerobić zeby były wszystkie strony
 i wyglądały jak te z css
+zmienic logowanie przez localstorage na sessionstorage
+poprawic strone home zeby nie wiem cos innego sie wyswietlalo bo jest troche nieestetycznie
 
-uzytkownik ma przycisk memberships ale nie moze zadnego kupic bo ich nie ma XD
+ADMIN:
+admin powinien moc zarzadzac userem zwyklym i moc go usunac i usunac/dodac/zmodyfikowac mu membership najlepiej osobny panel zrobic
+albo dodac adminowi do user panel przeglad userow i te opcje
+admin nie powinien wyswietlac niczego w my memberships 
 
-Po stronie admin panel trzeba dodać zeby memberships nie byly zalezne od usera
-i zeby mozna bylo po prostu dodac plan i tyle bez wyboru usera 
-i zeby te plany to byly wpisywane pola i trzeba dodac cene i czas trwania i powinno to tak wygladac
+TRENER:
+trener niech ma na sztywno Trainer Membership w my memberships w user panel
 
-Create membership
+USER:
+user moze kupic tylko jeden membership zeby mial zablokowane wiecej
+membershipy na bazie daty z komputera jesli sie zgadza to jest active na zielono napis
 
-Plan: nazwa wpisywana z klawiatury 
-Opis planu : jakis opis z klawiatury 
-Price : cena z klawiatury 
-Duration time: czas trwania Liczba dni 
-
-Trzeba jeszcze w admin panel dodac przycisk Add trainer i tam podac jakies dane trenera imie nazwisko i utworzyc 
-usera w bazie danych 
-
-Dodatkowo w admin panel przyciski Existing Trainers,
-Membership plans i all classes musza byc klikalne i wyswietlac te rzeczy
-
-Jako user dolaczanie do klas i wychodzenie z nich dziala bardzo fajnie
-tylko trzeba tam dodac jakies info jaki trener imie nazwisko i godziny zeby lepiej sie wyswietlaly
-czytelniej
-
-I jak chce jako user wybrac memberships to mam do wyboru te kilka planow i potem wybieram sam sobie date
-rozpoczecia po kliknieciu w plan mam ten kalendarz i najlepiej zeby te plany byly tak ladnie wyswietlone
-a nie ze taka sucha lista pusta tylko najlepiej zeby byly duze i widoczne
-
-i trzeba zmienic to logowanie przez localstorage 
+Kosmetyczne rzeczy:
+ogarnac swagger i logowanie google i jakies tam testy sprawdzic czy projekt sie buduje poprawnie itd z wymagan

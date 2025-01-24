@@ -25,13 +25,27 @@ function TrainerPanel() {
   const fetchMyClasses = async () => {
     try {
       const res = await axiosClient.get('/classes/');
-      const trainerClasses = res.data.filter((c) => c.trainer === user?.id);
+      // filter: only classes where trainer == user.id
+      const trainerClasses = res.data.filter((gc) => gc.trainer === user.id);
       setMyClasses(trainerClasses);
     } catch (err) {
       console.error(err);
+      alert('Could not fetch your classes.');
     }
   };
 
+  // Deleting class (only if we are trainer or admin)
+  const handleDeleteClass = async (classId) => {
+    if (!window.confirm('Are you sure you want to delete this class?')) return;
+    try {
+      await axiosClient.delete(`/classes/${classId}/`);
+      alert('Class deleted!');
+      fetchMyClasses();
+    } catch (err) {
+      console.error(err);
+      alert('Error deleting class.');
+    }
+  };
   const fetchAllUsers = async () => {
     try {
       const res = await axiosClient.get('/users/'); 
@@ -210,17 +224,23 @@ function TrainerPanel() {
 
       <section>
         <h3>My Created Classes</h3>
-        {myClasses.length === 0 ? (
-          <p>No classes yet.</p>
-        ) : (
-          <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-            {myClasses.map((c) => (
-              <li key={c.id} style={{ margin: '1rem 0' }}>
-                <strong>{c.name}</strong> ({c.class_type})<br />
-                {c.start_time} – {c.end_time}, capacity={c.capacity}
-              </li>
-            ))}
-          </ul>
+      {myClasses.length === 0 ? (
+        <p>You have not created any classes yet.</p>
+      ) : (
+        <ul>
+          {myClasses.map(gc => (
+            <li key={gc.id} style={{ marginBottom: '1rem' }}>
+              <strong>{gc.name}</strong>
+              <br />
+              Trainer: {gc.trainer_name}
+              <br />
+              {gc.start_local} – {gc.end_local}
+              <br />
+              Capacity: {gc.capacity}
+              <button onClick={() => handleDeleteClass(gc.id)}>Delete</button>
+            </li>
+          ))}
+        </ul>
         )}
       </section>
     </div>

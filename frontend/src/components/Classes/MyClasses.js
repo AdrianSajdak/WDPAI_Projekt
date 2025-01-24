@@ -14,11 +14,8 @@ function MyClasses() {
   const fetchMyClasses = async () => {
     try {
       const res = await axiosClient.get('/classes/');
-      if (!user) return;
-      const filtered = res.data.filter((cls) =>
-        cls.attendees.includes(user.id)
-      );
-      setMyClasses(filtered);
+      const joined = res.data.filter(gc => gc.attendees.includes(user.id));
+      setMyClasses(joined);
     } catch (err) {
       console.error(err);
       setError('Could not fetch your classes.');
@@ -43,12 +40,16 @@ function MyClasses() {
         <p>You have no enrolled classes.</p>
       ) : (
         <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-          {myClasses.map((c) => (
-            <li key={c.id} style={{ margin: '1rem 0' }}>
-              <strong>{c.name}</strong> ({c.class_type})<br />
-              {c.start_time} – {c.end_time}
+          {myClasses.map((gc) => (
+            <li key={gc.id} style={{ margin: '1rem 0' }}>
+              <strong>{gc.name}</strong>
               <br />
-              <button onClick={() => handleLeave(c.id)}>Leave</button>
+              Trainer: {gc.trainer_name}
+              <br />
+              {gc.start_local} – {gc.end_local}
+              <br />
+              Capacity: {gc.capacity}
+              <button onClick={() => handleLeave(gc.id)}>Leave</button>
             </li>
           ))}
         </ul>

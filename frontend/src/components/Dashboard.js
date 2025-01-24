@@ -73,11 +73,17 @@ function Dashboard() {
               <p>You are not enrolled in any classes.</p>
             ) : (
               <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-                {myClasses.map((c) => (
-                  <li key={c.id} style={{ margin: '1rem 0' }}>
-                    <strong>{c.name}</strong> ({c.class_type}) <br />
-                    {c.start_time} – {c.end_time}
-                  </li>
+                {myClasses.map((gc) => (
+            <li key={gc.id} style={{ margin: '1rem 0' }}>
+              <strong>{gc.name}</strong>
+              <br />
+              Trainer: {gc.trainer_name}
+              <br />
+              {gc.start_local} – {gc.end_local}
+              <br />
+              Capacity: {gc.capacity}
+              
+            </li>
                 ))}
               </ul>
             )}

@@ -14,20 +14,10 @@ class CustomUser(AbstractUser):
 
 
 class MembershipPlan(models.Model):
-    """
-    MembershipPlan must have a duration of at least 30 days,
-    and it must be a multiple of 30.
-    """
     name = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, default="")
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    duration_days = models.PositiveIntegerField(default=30)
-
-    def clean(self):
-        if self.duration_days < 30:
-            raise ValidationError("Minimum plan duration is 30 days.")
-        if self.duration_days % 30 != 0:
-            raise ValidationError("Plan duration must be in multiples of 30 days.")
+    duration_days = models.PositiveIntegerField()
 
     def __str__(self):
         return self.name
