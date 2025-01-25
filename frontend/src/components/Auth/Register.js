@@ -6,11 +6,11 @@ function Register() {
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
+    username: '',
     email: '',
     password: '',
     password2: '',
     termsAccepted: false,
-    is_trainer: false,
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -38,12 +38,11 @@ function Register() {
     }
 
     const payload = {
-      username: formData.email,
+      username: formData.username,
       email: formData.email,
       password: formData.password,
       first_name: formData.first_name,
       last_name: formData.last_name,
-      // is_trainer: formData.is_trainer, // if your backend expects it
     };
 
     try {
@@ -91,6 +90,16 @@ function Register() {
           </div>
           <div className="input-group">
             <input
+              type="username"
+              name="username"
+              placeholder="Username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <input
               type="email"
               name="email"
               placeholder="Email"
@@ -128,16 +137,6 @@ function Register() {
               onChange={handleChange}
             />
             <label>I accept the Terms of Use & Privacy Policy</label>
-          </div>
-
-          <div className="trainer-group">
-            <input
-              type="checkbox"
-              name="is_trainer"
-              checked={formData.is_trainer}
-              onChange={handleChange}
-            />
-            <label> Are you a trainer?</label>
           </div>
 
           <button type="submit" className="btn-green">SIGN UP</button>

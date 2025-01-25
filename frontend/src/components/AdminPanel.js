@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+// src/components/AdminPanel.js
+
+import React, { useState, useEffect } from 'react';
 import axiosClient from '../api/axiosClient';
 
 function AdminPanel() {
@@ -8,26 +10,27 @@ function AdminPanel() {
   const [users, setUsers] = useState([]);
   const [memberships, setMemberships] = useState([]);
 
-  // Dane do tworzenia nowego planu członkostwa
+  // Dane do tworzenia nowego planu
   const [planData, setPlanData] = useState({
     name: '',
     description: '',
-    price: '',
-    duration_days: '',
+    price: ''
+    // Usuwamy duration_days
   });
 
-  // Dane do tworzenia nowego trenera (z obsługą zdjęcia)
+  // Dane do tworzenia trenera (wybieramy istniejącego usera)
   const [trainerData, setTrainerData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    password: '',
+    user_id: '',        // <-- klucz
     specialization: '',
-    photo: null, // <-- dodajemy pole na plik
+    photo: null,
   });
+
+  // Wszystkich userów (do selecta)
+  const [allUsers, setAllUsers] = useState([]);
 
   useEffect(() => {
     fetchAll();
+    fetchAllUsers();
   }, []);
 
   const fetchAll = async () => {
@@ -36,31 +39,39 @@ function AdminPanel() {
       const pRes = await axiosClient.get('/membership-plans/');
       const cRes = await axiosClient.get('/classes/');
       const uRes = await axiosClient.get('/users/');
-
-      const mRes = await axiosClient.get('/memberships/'); // jako admin, widzi wszystkie
-      setMemberships(mRes.data);
+      const mRes = await axiosClient.get('/memberships/'); // admin - widzi wszystkie
 
       setTrainers(tRes.data);
       setPlans(pRes.data);
       setGroupClasses(cRes.data);
       setUsers(uRes.data);
+      setMemberships(mRes.data);
     } catch (err) {
       console.error(err);
     }
   };
 
-  // Tworzenie nowego planu
+  const fetchAllUsers = async () => {
+    try {
+      const res = await axiosClient.get('/users/');
+      setAllUsers(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Tworzenie MembershipPlan
   const addMembershipPlan = async (e) => {
     e.preventDefault();
     try {
-      await axiosClient.post('/membership-plans/', planData);
-      alert('Membership plan created successfully!');
-      setPlanData({
-        name: '',
-        description: '',
-        price: '',
-        duration_days: '',
+      await axiosClient.post('/membership-plans/', {
+        name: planData.name,
+        description: planData.description,
+        price: planData.price
+        // nie wysyłamy duration_days
       });
+      alert('Membership plan created successfully!');
+      setPlanData({ name: '', description: '', price: '' });
       fetchAll();
     } catch (err) {
       console.error(err);
@@ -76,17 +87,12 @@ function AdminPanel() {
     }));
   };
 
-  // Tworzenie nowego trenera
+  // Tworzenie trenera
   const addTrainer = async (e) => {
     e.preventDefault();
-
     try {
-      // Tworzymy FormData, żeby wysłać ewentualne zdjęcie
       const formData = new FormData();
-      formData.append('first_name', trainerData.first_name);
-      formData.append('last_name', trainerData.last_name);
-      formData.append('email', trainerData.email);
-      formData.append('password', trainerData.password);
+      formData.append('user_id', trainerData.user_id);
       formData.append('specialization', trainerData.specialization);
       if (trainerData.photo) {
         formData.append('photo', trainerData.photo);
@@ -99,14 +105,7 @@ function AdminPanel() {
       });
 
       alert('Trainer created successfully!');
-      setTrainerData({
-        first_name: '',
-        last_name: '',
-        email: '',
-        password: '',
-        specialization: '',
-        photo: null,
-      });
+      setTrainerData({ user_id: '', specialization: '', photo: null });
       fetchAll();
     } catch (err) {
       console.error(err);
@@ -114,6 +113,16 @@ function AdminPanel() {
     }
   };
 
+  const handleTrainerChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === 'photo') {
+      setTrainerData((prev) => ({ ...prev, photo: files[0] }));
+    } else {
+      setTrainerData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  // Usuwanie trenera
   function deleteTrainer(trainerId) {
     if (!window.confirm("Are you sure you want to delete this trainer?")) return;
     axiosClient.delete(`/trainers/${trainerId}/`)
@@ -126,30 +135,14 @@ function AdminPanel() {
         alert("Error deleting trainer.");
       });
   }
-  
-  // Obsługa zmian w formularzu trenera
-  const handleTrainerChange = (e) => {
-    const { name, value, files } = e.target;
-    // Jeśli pole to "photo", wówczas bierzemy plik z e.target.files[0]
-    if (name === 'photo') {
-      setTrainerData((prev) => ({
-        ...prev,
-        photo: files[0],
-      }));
-    } else {
-      setTrainerData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
-  };
 
+  // Usuwanie klasy
   function deleteClass(classId) {
     if (!window.confirm("Are you sure you want to delete this class?")) return;
     axiosClient.delete(`/classes/${classId}/`)
       .then(() => {
         alert("Class deleted!");
-        fetchAll();  // reload
+        fetchAll();
       })
       .catch(err => {
         console.error(err);
@@ -157,6 +150,7 @@ function AdminPanel() {
       });
   }
 
+  // Usuwanie planu
   function deletePlan(planId) {
     if (!window.confirm('Are you sure you want to delete this plan?')) return;
     axiosClient.delete(`/membership-plans/${planId}/`)
@@ -169,12 +163,12 @@ function AdminPanel() {
         alert('Error deleting plan.');
       });
   }
-  
+
   return (
     <div style={{ textAlign: 'center' }}>
       <h2>Admin Panel</h2>
 
-      {/* Sekcja do tworzenia NOWEGO PLANU */}
+      {/* Sekcja tworzenia MembershipPlan */}
       <section style={{ margin: '2rem 0' }}>
         <h3>Create Membership Plan</h3>
         <form
@@ -211,7 +205,7 @@ function AdminPanel() {
           </label>
 
           <label>
-            Price:
+            Price (monthly):
             <br />
             <input
               type="number"
@@ -223,18 +217,7 @@ function AdminPanel() {
             />
           </label>
 
-          <label>
-            Duration (days):
-            <br />
-            <input
-              type="number"
-              name="duration_days"
-              value={planData.duration_days}
-              onChange={handlePlanChange}
-              required
-            />
-          </label>
-
+          {/* Nie pokazujemy duration_days */}
           <button type="submit" className="btn-green" style={{ marginTop: '1rem' }}>
             Add Plan
           </button>
@@ -255,50 +238,21 @@ function AdminPanel() {
           }}
         >
           <label>
-            First Name:
+            Select existing user:
             <br />
-            <input
-              type="text"
-              name="first_name"
-              value={trainerData.first_name}
+            <select
+              name="user_id"
+              value={trainerData.user_id}
               onChange={handleTrainerChange}
               required
-            />
-          </label>
-
-          <label>
-            Last Name:
-            <br />
-            <input
-              type="text"
-              name="last_name"
-              value={trainerData.last_name}
-              onChange={handleTrainerChange}
-              required
-            />
-          </label>
-
-          <label>
-            Email:
-            <br />
-            <input
-              type="email"
-              name="email"
-              value={trainerData.email}
-              onChange={handleTrainerChange}
-              required
-            />
-          </label>
-
-          <label>
-            Password (optional):
-            <br />
-            <input
-              type="password"
-              name="password"
-              value={trainerData.password}
-              onChange={handleTrainerChange}
-            />
+            >
+              <option value="">-- select user --</option>
+              {allUsers.map(u => (
+                <option key={u.id} value={u.id}>
+                  {u.username} ({u.email})
+                </option>
+              ))}
+            </select>
           </label>
 
           <label>
@@ -329,67 +283,68 @@ function AdminPanel() {
         </form>
       </section>
 
-      {/* Sekcja: Existing Trainers */}
+      {/* Lista istniejących trenerów */}
       <section>
         <h3>Existing Trainers</h3>
         <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-    {trainers.map((tr) => (
-      <li key={tr.id} style={{ marginBottom: '1rem' }}>
-        <strong>
-          {tr.first_name} {tr.last_name}
-        </strong>{' '}
-        <br />
-        Email: {tr.email} <br />
-        Specialization: {tr.specialization || 'N/A'} <br />
-        {tr.photo && (
-          <img
-            src={tr.photo}
-            alt="Trainer Photo"
-            style={{ width: '100px', height: 'auto' }}
-          />
-        )}
-        <button onClick={() => deleteTrainer(tr.id)}>Delete</button>
-      </li>
-    ))}
-  </ul>
-        </section>
-{/* Membership Plans (lista) */}
-<section>
-  <h3>Membership Plans</h3>
-  <ul style={{ listStyle: 'none' }}>
-    {plans.map((pl) => (
-      <li key={pl.id} style={{ marginBottom: '1rem' }}>
-        <strong>{pl.name}</strong> – {pl.price} PLN ({pl.duration_days} days)
-        <br />
-        {pl.description}
-        <br />
-        <button onClick={() => deletePlan(pl.id)}>Delete</button>
-      </li>
-    ))}
-  </ul>
-</section>
+          {trainers.map((tr) => (
+            <li key={tr.id} style={{ marginBottom: '1rem' }}>
+              <strong>
+                {/* Brak trainer.user w serializerze, mamy user_id zamiast */}
+                Trainer ID: {tr.id}, User ID: {tr.user_id}
+              </strong>
+              <br />
+              Specialization: {tr.specialization || 'N/A'}
+              <br />
+              {tr.photo && (
+                <img
+                  src={tr.photo}
+                  alt="Trainer Photo"
+                  style={{ width: '100px', height: 'auto' }}
+                />
+              )}
+              <br />
+              <button onClick={() => deleteTrainer(tr.id)}>Delete</button>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-{/* All Classes */}
-<section>
-  <h3>All Classes</h3>
-  <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-    {groupClasses.map((gc) => (
-      <li key={gc.id} style={{ marginBottom: '1rem' }}>
-        <strong>{gc.name}</strong>
-        <br />
-        Trainer: {gc.trainer_name}
-        <br />
-        {gc.start_local} – {gc.end_local}
-        <br />
-        Capacity: {gc.capacity}
-        <br />
-        {/* Przycisk "Delete" (tylko admin) */}
-        <button onClick={() => deleteClass(gc.id)}>Delete Class</button>
-      </li>
-    ))}
-  </ul>
-</section>
+      {/* Membership Plans (lista) */}
+      <section>
+        <h3>Membership Plans</h3>
+        <ul style={{ listStyle: 'none' }}>
+          {plans.map((pl) => (
+            <li key={pl.id} style={{ marginBottom: '1rem' }}>
+              <strong>{pl.name}</strong> – {pl.price} PLN
+              <br />
+              {pl.description}
+              <br />
+              <button onClick={() => deletePlan(pl.id)}>Delete</button>
+            </li>
+          ))}
+        </ul>
+      </section>
 
+      {/* All Classes */}
+      <section>
+        <h3>All Classes</h3>
+        <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+          {groupClasses.map((gc) => (
+            <li key={gc.id} style={{ marginBottom: '1rem' }}>
+              <strong>{gc.name}</strong>
+              <br />
+              Trainer: {gc.trainer_name}
+              <br />
+              {gc.start_local} – {gc.end_local}
+              <br />
+              Capacity: {gc.capacity}
+              <br />
+              <button onClick={() => deleteClass(gc.id)}>Delete Class</button>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }

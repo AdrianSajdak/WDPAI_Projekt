@@ -1,5 +1,8 @@
+# backend/api/serializers.py
+
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from datetime import date, timedelta
 from .models import (
     MembershipPlan,
     Membership,
@@ -13,18 +16,11 @@ CustomUser = get_user_model()
 #  Custom User
 # -------------------------------------------------
 class CustomUserSerializer(serializers.ModelSerializer):
-    """
-    Serializer for displaying user info (no password creation logic here).
-    """
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'email', 'is_trainer', 'is_superuser', 'is_staff']
 
-
 class RegisterUserSerializer(serializers.ModelSerializer):
-    """
-    Serializer used for user registration. Handles password hashing.
-    """
     password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -40,103 +36,102 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-
 # -------------------------------------------------
 #  Membership Plan
 # -------------------------------------------------
 class MembershipPlanSerializer(serializers.ModelSerializer):
-    """
-    Enforces validation in the model's clean() method.
-    """
     class Meta:
         model = MembershipPlan
         fields = '__all__'
-
-    def validate(self, attrs):
-        # You can also call .clean() on the model to ensure
-        # the logic for multiples of 30 days is enforced
-        plan = MembershipPlan(**attrs)
-        plan.clean()  # raises ValidationError if invalid
-        return attrs
-
 
 # -------------------------------------------------
 #  Membership
 # -------------------------------------------------
 class MembershipSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
+    is_active = serializers.SerializerMethodField()
 
     class Meta:
         model = Membership
         fields = '__all__'
 
-
-
+    def get_is_active(self, obj):
+        return obj.is_active
+    
 # -------------------------------------------------
 #  Classes
 # -------------------------------------------------
 class GroupClassSerializer(serializers.ModelSerializer):
     trainer = serializers.PrimaryKeyRelatedField(read_only=True)
     trainer_name = serializers.SerializerMethodField()
-    start_local = serializers.SerializerMethodField()
-    end_local = serializers.SerializerMethodField()
+    date_local = serializers.SerializerMethodField()  
 
     class Meta:
         model = GroupClass
         fields = [
-            'id', 'name', 'trainer', 'trainer_name', 'start_time', 'end_time', 'start_local', 'end_local', 'capacity', 'attendees'
+            'id', 'name', 'trainer', 'trainer_name', 
+            'date_time', 'date_local', 'capacity', 
+            'attendees', 'class_type'
         ]
 
     def get_trainer_name(self, obj):
         if obj.trainer:
             return f"{obj.trainer.first_name} {obj.trainer.last_name}"
         return "No trainer"
-    
-    def get_start_local(self, obj):
-        # formatuj np. DD.MM.YYYY HH:MM
-        return obj.start_time.strftime("%d.%m.%Y %H:%M")
 
-    def get_end_local(self, obj):
-        return obj.end_time.strftime("%d.%m.%Y %H:%M")
+    def get_date_local(self, obj):
+        """Zwraca sformatowaną datę i godzinę np. 'DD.MM.YYYY HH:MM'."""
+        return obj.date_time.strftime("%d.%m.%Y %H:%M")
 
 # -------------------------------------------------
 #  Trainer
 # -------------------------------------------------
 class TrainerSerializer(serializers.ModelSerializer):
-    first_name = serializers.ReadOnlyField(source='user.first_name')
-    last_name = serializers.ReadOnlyField(source='user.last_name')
-    email = serializers.ReadOnlyField(source='user.email')
+    """
+    Zmieniamy tak, aby wybierać istniejącego usera, zamiast tworzyć nowego.
+    """
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(),
+        source='user'
+    )
     specialization = serializers.CharField(required=False)
     photo = serializers.ImageField(required=False)
-    
+
     class Meta:
         model = Trainer
-        fields = ['id', 'first_name', 'last_name', 'email', 'specialization', 'photo']
+        fields = ['id', 'user_id', 'specialization', 'photo']
 
     def create(self, validated_data):
-        # Wyciągamy dane
-        first_name = validated_data.pop('first_name')
-        last_name = validated_data.pop('last_name')
-        email = validated_data.pop('email')
-        password = validated_data.pop('password', None)  # moze byc None
-
-        # Tworzymy usera
-        # username = np. email lub generujemy
-        username = email
-        user = CustomUser.objects.create(
-            username=username,
-            email=email,
-            first_name=first_name,
-            last_name=last_name
-        )
-        if password:
-            user.set_password(password)
-        else:
-            # jesli nie podano password – generujemy random
-            from django.contrib.auth.hashers import make_password
-            user.password = make_password(CustomUser.objects.make_random_password())
+        user = validated_data['user']
+        # Ustawiamy user.is_trainer = True
+        user.is_trainer = True
         user.save()
 
         # Tworzymy obiekt Trainer
-        trainer = Trainer.objects.create(user=user, **validated_data)
+        trainer = Trainer.objects.create(**validated_data)
+
+        # Tworzymy "trainer membership" w razie potrzeby
+        self._create_trainer_membership(user)
+
         return trainer
+
+    def _create_trainer_membership(self, user):
+        from .models import MembershipPlan, Membership
+        import datetime
+
+        # Szukamy lub tworzymy plan "Trainer Membership"
+        plan, _ = MembershipPlan.objects.get_or_create(
+            name="Trainer Membership",
+            defaults={
+                "description": "Membership for trainers (unlimited)",
+                "price": 0,
+                "duration_days": 999999  # może być 999999 lub cokolwiek
+            }
+        )
+        # Ustawiamy membership "bez końca" (end_date=None) lub daleka data
+        Membership.objects.create(
+            user=user,
+            plan=plan,
+            start_date=datetime.date.today(),
+            end_date=None
+        )

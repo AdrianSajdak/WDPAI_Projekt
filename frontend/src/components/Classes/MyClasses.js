@@ -1,3 +1,4 @@
+// src/components/Classes/MyClasses.js
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../../api/axiosClient';
 import useAuth from '../../hooks/useAuth';
@@ -8,14 +9,16 @@ function MyClasses() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchMyClasses();
-  }, []);
+    if (user) {
+      fetchMyClasses();
+    }
+  }, [user]);
 
   const fetchMyClasses = async () => {
     try {
+      // backend zwróci TYLKO przyszłe klasy, w których user jest attendees/trainer
       const res = await axiosClient.get('/classes/');
-      const joined = res.data.filter(gc => gc.attendees.includes(user.id));
-      setMyClasses(joined);
+      setMyClasses(res.data);
     } catch (err) {
       console.error(err);
       setError('Could not fetch your classes.');
@@ -25,7 +28,6 @@ function MyClasses() {
   const handleLeave = async (classId) => {
     try {
       await axiosClient.post(`/classes/${classId}/leave/`);
-      alert('Left the class!');
       fetchMyClasses();
     } catch (err) {
       alert(err?.response?.data?.detail || 'Error leaving class.');
@@ -34,30 +36,29 @@ function MyClasses() {
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <h2>My Classes</h2>
+      <h2>My Upcoming Classes</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {myClasses.length === 0 ? (
-        <p>You have no enrolled classes.</p>
+        <p>You have no upcoming classes.</p>
       ) : (
         <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-          {myClasses.map((gc) => (
+          {myClasses.map(gc => (
             <li key={gc.id} style={{ margin: '1rem 0' }}>
               <strong>{gc.name}</strong>
               <br />
               Trainer: {gc.trainer_name}
               <br />
-              {gc.start_local} – {gc.end_local}
+              {gc.date_local}
               <br />
               Capacity: {gc.capacity}
-              <button onClick={() => handleLeave(gc.id)}>Leave</button>
+              <br />
+              {gc.attendees.includes(user.id) && (
+                <button onClick={() => handleLeave(gc.id)}>Leave</button>
+              )}
             </li>
           ))}
         </ul>
       )}
-      <br />
-      <a href="/dashboard" className="btn">
-        Back to Dashboard
-      </a>
     </div>
   );
 }

@@ -1,9 +1,12 @@
+# backend/api/views.py
+
 from django.contrib.auth import get_user_model
 from rest_framework import generics, status, viewsets, permissions
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django.db import transaction
+from django.db.models import Q
+from rest_framework.exceptions import ValidationError
+from django.utils import timezone
 
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
@@ -28,27 +31,16 @@ class RegisterUserView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = RegisterUserSerializer
     permission_classes = [permissions.AllowAny]
-    # No need for perform_create to handle password hashing, 
-    # it's handled in RegisterUserSerializer.create()
 
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def google_login(request):
-    """
-    Example Google Login flow using an ID token.
-    - You need to verify the token with Google's OAuth2 library.
-    - Retrieve user info. If user doesn't exist, create one.
-    - Returns a basic user representation (CustomUserSerializer).
-    """
     token = request.data.get('token')
     if not token:
-        return Response(
-            {"error": "Google token is missing."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({"error": "Google token is missing."},
+                        status=status.HTTP_400_BAD_REQUEST)
 
-    # Use your actual Google CLIENT_ID from settings or env variable
     from django.conf import settings
     CLIENT_ID = getattr(settings, 'GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID')
 
@@ -69,8 +61,6 @@ def google_login(request):
                 'last_name': ' '.join(name.split(' ')[1:]) if len(name.split(' ')) > 1 else '',
             }
         )
-        # If created is True, new user was just created.
-        # If you want to set a random password or do other logic, do it here.
         if created:
             user.set_password(CustomUser.objects.make_random_password())
             user.save()
@@ -78,22 +68,27 @@ def google_login(request):
         return Response(CustomUserSerializer(user).data)
 
     except ValueError:
-        return Response(
-            {"error": "Invalid Google token."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({"error": "Invalid Google token."},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 # -------------------------------------------------
 #  MEMBERSHIP PLANS
+#   (Ukrycie "Trainer Membership" w listach)
 # -------------------------------------------------
 class MembershipPlanViewSet(viewsets.ModelViewSet):
-    queryset = MembershipPlan.objects.all()
     serializer_class = MembershipPlanSerializer
     
+    def get_queryset(self):
+        qs = MembershipPlan.objects.all()
+        # Ukrywamy plan "Trainer Membership" w listach
+        if self.action == 'list':
+            qs = qs.exclude(name="Trainer Membership")
+        return qs
+
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            return [permissions.AllowAny()]  # lub [permissions.IsAuthenticatedOrReadOnly()]
+            return [permissions.AllowAny()]
         else:
             return [AdminRequired()]
 
@@ -106,91 +101,122 @@ class MembershipViewSet(viewsets.ModelViewSet):
     serializer_class = MembershipSerializer
 
     def get_permissions(self):
-        if self.action in ['create']:
-            return [permissions.IsAuthenticated()]
-        elif self.action in ['list', 'retrieve']:
-        # Zezwól na list/retrieve zalogowanym (IsAuthenticated)
+        # Dodajemy 'end' do listy akcji dostępnych dla zalogowanego usera
+        if self.action in ['create', 'list', 'retrieve', 'end']:
             return [permissions.IsAuthenticated()]
         else:
-        # update, partial_update, destroy => admin
             return [AdminRequired()]
 
-
     def get_queryset(self):
+        """
+        Zwracamy wyłącznie aktywne membershipy należące do aktualnego użytkownika
+        (nawet jeśli jest adminem czy trenerem).
+        Nie chcemy pokazywać membershipów innych osób ani membershipów nieaktywnych.
+        """
         user = self.request.user
-        if user.is_superuser:
-            return Membership.objects.all()
-        # Normal user sees only their memberships
-        return Membership.objects.filter(user=user)
+        now = timezone.now().date()
+
+        # membership aktywny => start_date <= today < end_date (lub end_date == None)
+        # ponieważ w modelu: is_active => (start_date <= now < end_date) lub end_date=None
+        # Ale musimy to odtworzyć w filtrze bazy (bo is_active to property).
+        return Membership.objects.filter(
+            user=user,
+            start_date__lte=now
+        ).filter(
+            Q(end_date__isnull=True) | Q(end_date__gt=now)
+        )
 
     def perform_create(self, serializer):
-        if self.request.user.is_superuser:
-            serializer.save()
-        else:
-            serializer.save(user=self.request.user)
+        # Blokada kupna membershipu przez trenera (jeśli nie jest superuserem)
+        if self.request.user.is_trainer and not self.request.user.is_superuser:
+            raise ValidationError("Trainers cannot buy memberships.")
+
+        # Sprawdzamy, czy user ma jakikolwiek aktywny membership
+        existing_active = self.get_queryset()  # Już zawęża do aktywnych usera
+        if existing_active.exists():
+            raise ValidationError("You already have an active membership. End it first.")
+
+        # Tworzymy membership
+        serializer.save(user=self.request.user)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def end(self, request, pk=None):
+        membership = self.get_object()
+
+        # w get_queryset już jest user=..., więc membership musi należeć do request.user
+        # ale jakby co:
+        if membership.user != request.user and not request.user.is_superuser:
+            return Response({"detail": "Not allowed."}, status=status.HTTP_403_FORBIDDEN)
+
+        # Ustawiamy end_date = today => membership staje się nieaktywny
+        membership.end_date = timezone.now().date()
+        membership.save()
+        return Response({"detail": "Membership ended."}, status=status.HTTP_200_OK)
 
 
 # -------------------------------------------------
 #  CLASSES
 # -------------------------------------------------
 class GroupClassViewSet(viewsets.ModelViewSet):
-    queryset = GroupClass.objects.all()
     serializer_class = GroupClassSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_permissions(self):
-        """
-        Only a trainer or admin can create/update/destroy.
-        Everyone (logged-in or read-only) can list or retrieve.
-        """
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [TrainerRequired()]
         return super().get_permissions()
 
+    def get_queryset(self):
+        """
+        Zwracamy tylko zajęcia w przyszłości (date_time >= teraz)
+        i tylko takie, w których current user jest uczestnikiem (attendees)
+        lub ich trenerem (trainer).
+        Dzięki temu:
+         - user nie widzi starych zajęć
+         - user nie widzi cudzych zajęć
+         - trener widzi tylko swoje
+        """
+        user = self.request.user
+        now = timezone.now()
+
+        # Filtrujemy do date_time >= now:
+        future_classes = GroupClass.objects.filter(date_time__gte=now)
+
+        # Dla trenera -> cokolwiek trenował lub dołączył
+        # Dla zwykłego usera -> dołączył 
+        # (jeśli chcesz żeby zwykły user widział wszystkie future classes i mógł się zapisać, to musisz to zmienić)
+        return future_classes.filter(
+            Q(trainer=user) | Q(attendees=user)
+        )
+
     def perform_create(self, serializer):
-        """
-        Sets the trainer to the logged-in user who is creating the class.
-        """
+        # Tworzenie zajęć => trainer = request.user
         serializer.save(trainer=self.request.user)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def join(self, request, pk=None):
-        """
-        A user can join a class if there is capacity.
-        Uses a database transaction to avoid race conditions.
-        """
         with transaction.atomic():
             group_class = self.get_object()
             if request.user in group_class.attendees.all():
-                return Response(
-                    {"detail": "You are already registered for this class."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                return Response({"detail": "You are already registered for this class."},
+                                status=status.HTTP_400_BAD_REQUEST)
             if group_class.attendees.count() >= group_class.capacity:
-                return Response(
-                    {"detail": "No available spots."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                return Response({"detail": "No available spots."},
+                                status=status.HTTP_400_BAD_REQUEST)
             group_class.attendees.add(request.user)
             return Response({"detail": "You have joined the class."}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def leave(self, request, pk=None):
-        """
-        A user can leave a class if they are currently enrolled.
-        """
         group_class = self.get_object()
         if request.user not in group_class.attendees.all():
-            return Response(
-                {"detail": "You are not enrolled in this class."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"detail": "You are not enrolled in this class."},
+                            status=status.HTTP_400_BAD_REQUEST)
         group_class.attendees.remove(request.user)
         return Response({"detail": "You have left the class."}, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        # if user is trainer and instance.trainer == user, or user is superuser
         if request.user.is_superuser or instance.trainer == request.user:
             self.perform_destroy(instance)
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -206,29 +232,20 @@ class TrainerViewSet(viewsets.ModelViewSet):
     serializer_class = TrainerSerializer
     permission_classes = [AdminRequired]
 
-    
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([permissions.IsAuthenticated])
 def get_current_user(request):
-    """
-    Returns the current logged-in user's information.
-    """
     user = request.user
     serializer = CustomUserSerializer(user)
     return Response(serializer.data, status=200)
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Return a list of all users.
-    Only trainer or admin can list them.
-    """
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
     def get_permissions(self):
-        # For example: let only trainers/admin see it
         if self.action in ['list', 'retrieve']:
             return [TrainerRequired()]
         return [permissions.IsAdminUser()]

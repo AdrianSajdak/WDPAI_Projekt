@@ -1,3 +1,5 @@
+// src/components/TrainerPanel.js
+
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../api/axiosClient';
 import useAuth from '../hooks/useAuth';
@@ -7,11 +9,11 @@ function TrainerPanel() {
   const [myClasses, setMyClasses] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
 
+  // Zamiast start_time i end_time, mamy tylko date_time
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    start_time: '',
-    end_time: '',
+    date_time: '',  // <-- single field
     capacity: 10,
     class_type: 'group',
     selected_user: '',
@@ -26,7 +28,7 @@ function TrainerPanel() {
     try {
       const res = await axiosClient.get('/classes/');
       // filter: only classes where trainer == user.id
-      const trainerClasses = res.data.filter((gc) => gc.trainer === user.id);
+      const trainerClasses = res.data.filter(gc => gc.trainer === user.id);
       setMyClasses(trainerClasses);
     } catch (err) {
       console.error(err);
@@ -34,21 +36,9 @@ function TrainerPanel() {
     }
   };
 
-  // Deleting class (only if we are trainer or admin)
-  const handleDeleteClass = async (classId) => {
-    if (!window.confirm('Are you sure you want to delete this class?')) return;
-    try {
-      await axiosClient.delete(`/classes/${classId}/`);
-      alert('Class deleted!');
-      fetchMyClasses();
-    } catch (err) {
-      console.error(err);
-      alert('Error deleting class.');
-    }
-  };
   const fetchAllUsers = async () => {
     try {
-      const res = await axiosClient.get('/users/'); 
+      const res = await axiosClient.get('/users/');
       setAllUsers(res.data);
     } catch (err) {
       console.error(err);
@@ -68,8 +58,7 @@ function TrainerPanel() {
       let postData = {
         name: formData.name,
         description: formData.description,
-        start_time: formData.start_time,
-        end_time: formData.end_time,
+        date_time: formData.date_time, // <-- JEDNO pole
         class_type: formData.class_type,
       };
 
@@ -79,6 +68,7 @@ function TrainerPanel() {
         // individual
         postData.capacity = 1;
         if (formData.selected_user) {
+          // automatycznie doda uczestnika (opcjonalnie)
           postData.attendees = [Number(formData.selected_user)];
         }
       }
@@ -97,12 +87,23 @@ function TrainerPanel() {
     setFormData({
       name: '',
       description: '',
-      start_time: '',
-      end_time: '',
+      date_time: '',
       capacity: 10,
       class_type: 'group',
       selected_user: '',
     });
+  };
+
+  const handleDeleteClass = async (classId) => {
+    if (!window.confirm('Are you sure you want to delete this class?')) return;
+    try {
+      await axiosClient.delete(`/classes/${classId}/`);
+      alert('Class deleted!');
+      fetchMyClasses();
+    } catch (err) {
+      console.error(err);
+      alert('Error deleting class.');
+    }
   };
 
   return (
@@ -145,25 +146,14 @@ function TrainerPanel() {
             />
           </label>
 
+          {/* Jedno pole - data i godzina */}
           <label>
-            Start time:
+            Date & Time:
             <br />
             <input
               type="datetime-local"
-              name="start_time"
-              value={formData.start_time}
-              onChange={handleChange}
-              required
-            />
-          </label>
-
-          <label>
-            End time:
-            <br />
-            <input
-              type="datetime-local"
-              name="end_time"
-              value={formData.end_time}
+              name="date_time"
+              value={formData.date_time}
               onChange={handleChange}
               required
             />
@@ -182,6 +172,7 @@ function TrainerPanel() {
             </select>
           </label>
 
+          {/* Tylko przy group dajemy capacity */}
           {formData.class_type === 'group' ? (
             <label>
               Capacity:
@@ -224,23 +215,27 @@ function TrainerPanel() {
 
       <section>
         <h3>My Created Classes</h3>
-      {myClasses.length === 0 ? (
-        <p>You have not created any classes yet.</p>
-      ) : (
-        <ul>
-          {myClasses.map(gc => (
-            <li key={gc.id} style={{ marginBottom: '1rem' }}>
-              <strong>{gc.name}</strong>
-              <br />
-              Trainer: {gc.trainer_name}
-              <br />
-              {gc.start_local} – {gc.end_local}
-              <br />
-              Capacity: {gc.capacity}
-              <button onClick={() => handleDeleteClass(gc.id)}>Delete</button>
-            </li>
-          ))}
-        </ul>
+        {myClasses.length === 0 ? (
+          <p>You have not created any classes yet.</p>
+        ) : (
+          <ul>
+            {myClasses.map((gc) => (
+              <li key={gc.id} style={{ marginBottom: '1rem' }}>
+                <strong>{gc.name}</strong>
+                <br />
+                Trainer: {gc.trainer_name}
+                <br />
+                {/* Wyświetlamy jedną datę np. "date_local" z serializer */}
+                {gc.date_local}
+                <br />
+                Capacity: {gc.capacity}
+                <br />
+                <button onClick={() => handleDeleteClass(gc.id)}>
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
       </section>
     </div>

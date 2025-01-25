@@ -4,17 +4,13 @@ i wyglądały jak te z css
 zmienic logowanie przez localstorage na sessionstorage
 poprawic strone home zeby nie wiem cos innego sie wyswietlalo bo jest troche nieestetycznie
 
-ADMIN:
-admin powinien moc zarzadzac userem zwyklym i moc go usunac i usunac/dodac/zmodyfikowac mu membership najlepiej osobny panel zrobic
-albo dodac adminowi do user panel przeglad userow i te opcje
-admin nie powinien wyswietlac niczego w my memberships 
-
-TRENER:
-trener niech ma na sztywno Trainer Membership w my memberships w user panel
-
-USER:
-user moze kupic tylko jeden membership zeby mial zablokowane wiecej
-membershipy na bazie daty z komputera jesli sie zgadza to jest active na zielono napis
-
 Kosmetyczne rzeczy:
 ogarnac swagger i logowanie google i jakies tam testy sprawdzic czy projekt sie buduje poprawnie itd z wymagan
+
+Indywidualne zajęcia nie wyświetlaja się w zakładce allClasses użytkownikom których te zajęcia nie dotyczą.
+
+Po odświeżeniu aplikacji przenosi na strone logowania to trzeba zmienic zeby się tak nie działo
+
+Nie wyświetlają się daty przy zajęciach z niewiadomego powodu.
+
+PRZEDEWSZYSTKIM TO TRZEBA CSS NAPISAĆ FAJNEGO BO TERAZ TE FORMULARZE WYGLADAJA FATALNIE.

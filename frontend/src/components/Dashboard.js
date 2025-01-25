@@ -55,7 +55,7 @@ function Dashboard() {
                 {myMemberships.map((m) => (
                   <li key={m.id} style={{ margin: '1rem 0' }}>
                     <strong>Plan:</strong> {m.plan} <br />
-                    From: {m.start_date} – To: {m.end_date}{' '}
+                    <strong>From:</strong> {m.start_date} - <strong>To:</strong> {m.end_date}                    
                     {m.is_active ? (
                       <span style={{ color: 'green' }}>(Active)</span>
                     ) : (

@@ -1,3 +1,5 @@
+// src/components/Classes/AllClasses.js
+
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../../api/axiosClient';
 import useAuth from '../../hooks/useAuth';
@@ -52,7 +54,6 @@ function AllClasses() {
         <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
           {classesList.map((gc) => {
             const freeSpots = gc.capacity - (gc.attendees?.length || 0);
-            // sprawdzamy, czy user jest w gc.attendees
             const isJoined = user && gc.attendees?.includes(user.id);
 
             return (
@@ -61,12 +62,11 @@ function AllClasses() {
                 <br />
                 Trainer: {gc.trainer_name}
                 <br />
-                {gc.start_local} – {gc.end_local}
+                {gc.date_local}
                 <br />
                 Spots: {freeSpots} / {gc.capacity}
                 <br />
-                {/* Przyciski join/leave tylko jeśli user zalogowany */}
-                {user && !user.is_trainer &&(
+                {user && !user.is_trainer && (
                   isJoined ? (
                     <button onClick={() => handleLeave(gc.id)}>Leave</button>
                   ) : (
