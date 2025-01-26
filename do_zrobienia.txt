@@ -1,7 +1,0 @@
-LAYOUT:
-figme przerobić zeby były wszystkie strony wyglądały jak te z css
-
-Do ogarnięcia:
-Swagger - zrobione, przetestowac
-
-
