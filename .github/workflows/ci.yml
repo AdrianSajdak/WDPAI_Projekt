@@ -19,6 +19,5 @@ jobs:
     - name: Build and run containers
       run: |
         docker-compose build
-        docker-compose up -d db  
-        docker-compose up -d web 
+        docker-compose up -d 
         docker-compose run web python manage.py test
