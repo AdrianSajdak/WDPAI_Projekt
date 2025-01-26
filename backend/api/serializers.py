@@ -25,16 +25,27 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'password']
+        fields = [
+            'id', 'username', 'email',
+            'password',
+            'first_name', 'last_name'
+        ]
 
     def create(self, validated_data):
+    # Pobieramy dane
+        first_name = validated_data.get('first_name', '')
+        last_name = validated_data.get('last_name', '')
+
         user = CustomUser(
             username=validated_data['username'],
-            email=validated_data['email']
+            email=validated_data['email'],
+            first_name=first_name,
+            last_name=last_name
         )
         user.set_password(validated_data['password'])
         user.save()
         return user
+
 
 # -------------------------------------------------
 #  Membership Plan
@@ -48,15 +59,21 @@ class MembershipPlanSerializer(serializers.ModelSerializer):
 #  Membership
 # -------------------------------------------------
 class MembershipSerializer(serializers.ModelSerializer):
+    plan_name = serializers.ReadOnlyField(source='plan.name')
     user = serializers.PrimaryKeyRelatedField(read_only=True)
     is_active = serializers.SerializerMethodField()
 
     class Meta:
         model = Membership
-        fields = '__all__'
+        fields = [
+            'id', 'plan', 'plan_name',
+            'user', 'start_date', 'end_date',
+            'is_active'
+        ]
 
     def get_is_active(self, obj):
         return obj.is_active
+
     
 # -------------------------------------------------
 #  Classes
@@ -79,6 +96,8 @@ class GroupClassSerializer(serializers.ModelSerializer):
             return f"{obj.trainer.first_name} {obj.trainer.last_name}"
         return "No trainer"
 
+
+
     def get_date_local(self, obj):
         """Zwraca sformatowaną datę i godzinę np. 'DD.MM.YYYY HH:MM'."""
         return obj.date_time.strftime("%d.%m.%Y %H:%M")
@@ -87,19 +106,15 @@ class GroupClassSerializer(serializers.ModelSerializer):
 #  Trainer
 # -------------------------------------------------
 class TrainerSerializer(serializers.ModelSerializer):
-    """
-    Zmieniamy tak, aby wybierać istniejącego usera, zamiast tworzyć nowego.
-    """
-    user_id = serializers.PrimaryKeyRelatedField(
-        queryset=CustomUser.objects.all(),
-        source='user'
-    )
+    user_id = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), source='user')
+    first_name = serializers.ReadOnlyField(source='user.first_name')
+    last_name = serializers.ReadOnlyField(source='user.last_name')
     specialization = serializers.CharField(required=False)
     photo = serializers.ImageField(required=False)
 
     class Meta:
         model = Trainer
-        fields = ['id', 'user_id', 'specialization', 'photo']
+        fields = ['id', 'user_id', 'first_name', 'last_name', 'specialization', 'photo']
 
     def create(self, validated_data):
         user = validated_data['user']

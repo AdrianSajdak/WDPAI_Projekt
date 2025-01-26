@@ -22,7 +22,7 @@ class MembershipPlan(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, default="")
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    duration_days = models.PositiveIntegerField(default=30, editable=False)  # np. 30
+    duration_days = models.PositiveIntegerField(default=30)  # np. 30
 
     def __str__(self):
         return self.name

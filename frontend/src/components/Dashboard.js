@@ -54,7 +54,7 @@ function Dashboard() {
               <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
                 {myMemberships.map((m) => (
                   <li key={m.id} style={{ margin: '1rem 0' }}>
-                    <strong>Plan:</strong> {m.plan} <br />
+                    <strong>Plan:</strong> {m.plan_name} <br />
                     <strong>From:</strong> {m.start_date} - <strong>To:</strong> {m.end_date}                    
                     {m.is_active ? (
                       <span style={{ color: 'green' }}>(Active)</span>
@@ -68,26 +68,26 @@ function Dashboard() {
           </section>
 
           <section style={{ marginBottom: '2rem' }}>
-            <h3>My Classes</h3>
-            {myClasses.length === 0 ? (
-              <p>You are not enrolled in any classes.</p>
-            ) : (
-              <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-                {myClasses.map((gc) => (
-            <li key={gc.id} style={{ margin: '1rem 0' }}>
-              <strong>{gc.name}</strong>
-              <br />
-              Trainer: {gc.trainer_name}
-              <br />
-              {gc.start_local} – {gc.end_local}
-              <br />
-              Capacity: {gc.capacity}
-              
-            </li>
-                ))}
-              </ul>
-            )}
-          </section>
+  <h3>My Classes</h3>
+  {myClasses.length === 0 ? (
+    <p>You are not enrolled in any classes.</p>
+  ) : (
+    <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+      {myClasses.map((gc) => (
+        <li key={gc.id} style={{ margin: '1rem 0' }}>
+          <strong>{gc.name}</strong>
+          <br />
+          Trainer: {gc.trainer_name}       {/* <-- z serializer */}
+          <br />
+          Date: {gc.date_local}           {/* <-- z serializer */}
+          <br />
+          Capacity: {gc.capacity}
+        </li>
+      ))}
+    </ul>
+  )}
+</section>
+
 
           <Link to="/all-classes" className="btn">
             View All Classes

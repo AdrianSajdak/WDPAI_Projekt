@@ -59,7 +59,7 @@ function MyMemberships() {
           {memberships.map(m => (
             <li key={m.id} style={{ marginBottom: '1rem' }}>
               <strong>Membership ID: {m.id}</strong><br/>
-              Plan: {m.plan} <br />
+              <p><strong>Plan:</strong> {activeMembership.plan_name}</p>
               From: {m.start_date} – To: {m.end_date || 'None'} 
               <br />
               {/* is_active z serializera - tu prawie zawsze true,

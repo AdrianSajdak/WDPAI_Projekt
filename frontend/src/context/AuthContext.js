@@ -1,53 +1,56 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axiosClient from '../api/axiosClient';
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';  // <-- default import, bez klamerek
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [accessToken, setAccessToken] = useState(
-    localStorage.getItem('access_token') || null
-  );
+  const [accessToken, setAccessToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Fetch current user from /me/ endpoint
+  // Pobiera aktualnego usera z /me/
   const fetchCurrentUser = async () => {
     try {
-      const response = await axiosClient.get('/me/');
-      // e.g. { id, username, email, is_trainer, is_superuser, ... }
-      setUser(response.data);
+      const res = await axiosClient.get('/me/');
+      setUser(res.data);
     } catch (err) {
       console.error('fetchCurrentUser error:', err);
+      // w razie błędu, user = null
       setUser(null);
     }
   };
 
-  // If we have a token, try to decode and fetch user info
+  // Pierwszy effect: sprawdzamy sessionStorage, dekodujemy token
   useEffect(() => {
-    const initAuth = async () => {
-      if (accessToken) {
-        try {
-          const decoded = jwtDecode(accessToken);
-          // Check if token is expired
-          if (decoded.exp * 1000 < Date.now()) {
-            logout();
-          } else {
-            // Valid token -> fetch user
-            await fetchCurrentUser();
-          }
-        } catch (error) {
-          console.error('initAuth decode error:', error);
-          logout();
-        }
-      }
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+      // brak tokena => nie logujemy
       setLoading(false);
-    };
-    initAuth();
-  }, [accessToken]);
+      return;
+    }
 
-  // Login: obtain token from backend (/token/) then fetch user
+    try {
+      const decoded = jwtDecode(token);
+      // Sprawdzamy czy token wygasł
+      if (decoded.exp * 1000 < Date.now()) {
+        // exp jest w sekundach, Date.now() w ms
+        logout();
+        setLoading(false);
+      } else {
+        // token ważny => setAccessToken i fetchUser
+        setAccessToken(token);
+        fetchCurrentUser().finally(() => setLoading(false));
+      }
+    } catch (err) {
+      console.error('decode error:', err);
+      logout();
+      setLoading(false);
+    }
+  }, []);
+
+  // Logowanie z backendu (np. /api/token/) – zapis tokenów
   const login = async (username, password) => {
     try {
       setError('');
@@ -56,11 +59,10 @@ export const AuthProvider = ({ children }) => {
         password,
       });
       const { access, refresh } = response.data;
-      localStorage.setItem('access_token', access);
-      localStorage.setItem('refresh_token', refresh);
+      sessionStorage.setItem('access_token', access);
+      sessionStorage.setItem('refresh_token', refresh);
       setAccessToken(access);
 
-      // fetch user info
       await fetchCurrentUser();
       return true;
     } catch (err) {
@@ -70,29 +72,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout: remove tokens from local storage and clear state
+  // Wylogowanie
   const logout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('refresh_token');
     setAccessToken(null);
     setUser(null);
     setError('');
   };
 
-  // Google login flow
+  // Google login
   const googleLogin = async (googleToken) => {
     try {
       setError('');
       const response = await axiosClient.post('/google-login/', {
         token: googleToken,
       });
-      // Suppose the backend also returns { access, refresh }:
+      // Jeśli backend zwraca { access, refresh }
       const { access, refresh } = response.data;
-      localStorage.setItem('access_token', access);
-      localStorage.setItem('refresh_token', refresh);
+      sessionStorage.setItem('access_token', access);
+      sessionStorage.setItem('refresh_token', refresh);
       setAccessToken(access);
 
-      // fetch user info
       await fetchCurrentUser();
       return true;
     } catch (err) {

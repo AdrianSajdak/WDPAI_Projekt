@@ -1,16 +1,16 @@
 LAYOUT:
-figme przerobić zeby były wszystkie strony
-i wyglądały jak te z css
-zmienic logowanie przez localstorage na sessionstorage
+figme przerobić zeby były wszystkie strony wyglądały jak te z css
 poprawic strone home zeby nie wiem cos innego sie wyswietlalo bo jest troche nieestetycznie
-
-Kosmetyczne rzeczy:
-ogarnac swagger i logowanie google i jakies tam testy sprawdzic czy projekt sie buduje poprawnie itd z wymagan
-
-Indywidualne zajęcia nie wyświetlaja się w zakładce allClasses użytkownikom których te zajęcia nie dotyczą.
-
-Po odświeżeniu aplikacji przenosi na strone logowania to trzeba zmienic zeby się tak nie działo
-
-Nie wyświetlają się daty przy zajęciach z niewiadomego powodu.
-
 PRZEDEWSZYSTKIM TO TRZEBA CSS NAPISAĆ FAJNEGO BO TERAZ TE FORMULARZE WYGLADAJA FATALNIE.
+Wyrównać formularze wgl bo sa tak krzywo XD
+
+Cała logika projektu jest dobrze
+
+Do ogarnięcia:
+Swagger - zrobione, przetestowac
+Github Actions - jest zrobione w katalogu na githubie .github/workflows i tam jest plik w którym sie uruchamiaja te testy 
+nie wiem mozna moze cos dopisac/sprawdzic czy jest git
+
+Google login - projekt zostal tam utworzony i zajme sie tym samemu
+
+

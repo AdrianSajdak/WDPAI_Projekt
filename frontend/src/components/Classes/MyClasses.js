@@ -48,7 +48,7 @@ function MyClasses() {
               <br />
               Trainer: {gc.trainer_name}
               <br />
-              {gc.date_local}
+              Date: {gc.date_local}
               <br />
               Capacity: {gc.capacity}
               <br />

@@ -14,8 +14,8 @@ function AdminPanel() {
   const [planData, setPlanData] = useState({
     name: '',
     description: '',
-    price: ''
-    // Usuwamy duration_days
+    price: '',
+    duration_days: '',
   });
 
   // Dane do tworzenia trenera (wybieramy istniejącego usera)
@@ -67,11 +67,11 @@ function AdminPanel() {
       await axiosClient.post('/membership-plans/', {
         name: planData.name,
         description: planData.description,
-        price: planData.price
-        // nie wysyłamy duration_days
+        price: planData.price,
+        duration_days: planData.duration_days,
       });
       alert('Membership plan created successfully!');
-      setPlanData({ name: '', description: '', price: '' });
+      setPlanData({ name: '', description: '', price: '', duration_days: '' });
       fetchAll();
     } catch (err) {
       console.error(err);
@@ -217,7 +217,16 @@ function AdminPanel() {
             />
           </label>
 
-          {/* Nie pokazujemy duration_days */}
+          <label>
+            Duration (days):
+          <br />
+          <input
+            type="number"
+            name="duration_days"
+            value={planData.duration_days}
+            onChange={handlePlanChange}
+          />
+          </label>
           <button type="submit" className="btn-green" style={{ marginTop: '1rem' }}>
             Add Plan
           </button>
@@ -284,31 +293,31 @@ function AdminPanel() {
       </section>
 
       {/* Lista istniejących trenerów */}
-      <section>
-        <h3>Existing Trainers</h3>
-        <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-          {trainers.map((tr) => (
-            <li key={tr.id} style={{ marginBottom: '1rem' }}>
-              <strong>
-                {/* Brak trainer.user w serializerze, mamy user_id zamiast */}
-                Trainer ID: {tr.id}, User ID: {tr.user_id}
-              </strong>
-              <br />
-              Specialization: {tr.specialization || 'N/A'}
-              <br />
-              {tr.photo && (
-                <img
-                  src={tr.photo}
-                  alt="Trainer Photo"
-                  style={{ width: '100px', height: 'auto' }}
-                />
-              )}
-              <br />
-              <button onClick={() => deleteTrainer(tr.id)}>Delete</button>
-            </li>
-          ))}
-        </ul>
-      </section>
+<section>
+  <h3>Existing Trainers</h3>
+  <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+    {trainers.map((tr) => (
+      <li key={tr.id} style={{ marginBottom: '1rem' }}>
+        <strong>
+          {tr.first_name} {tr.last_name}
+        </strong>
+        <br />
+        Specialization: {tr.specialization || 'N/A'}
+        <br />
+        {tr.photo && (
+          <img
+            src={tr.photo}
+            alt="Trainer Photo"
+            style={{ width: '100px', height: 'auto' }}
+          />
+        )}
+        <br />
+        <button onClick={() => deleteTrainer(tr.id)}>Delete</button>
+      </li>
+    ))}
+  </ul>
+</section>
+
 
       {/* Membership Plans (lista) */}
       <section>
@@ -327,24 +336,25 @@ function AdminPanel() {
       </section>
 
       {/* All Classes */}
-      <section>
-        <h3>All Classes</h3>
-        <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-          {groupClasses.map((gc) => (
-            <li key={gc.id} style={{ marginBottom: '1rem' }}>
-              <strong>{gc.name}</strong>
-              <br />
-              Trainer: {gc.trainer_name}
-              <br />
-              {gc.start_local} – {gc.end_local}
-              <br />
-              Capacity: {gc.capacity}
-              <br />
-              <button onClick={() => deleteClass(gc.id)}>Delete Class</button>
-            </li>
-          ))}
-        </ul>
-      </section>
+<section>
+  <h3>All Classes</h3>
+  <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+    {groupClasses.map((gc) => (
+      <li key={gc.id} style={{ marginBottom: '1rem' }}>
+        <strong>{gc.name}</strong>
+        <br />
+        Trainer: {gc.trainer_name}
+        <br />
+        Date: {gc.date_local} 
+        <br />
+        Capacity: {gc.capacity}
+        <br />
+        <button onClick={() => deleteClass(gc.id)}>Delete Class</button>
+      </li>
+    ))}
+  </ul>
+</section>
+
     </div>
   );
 }

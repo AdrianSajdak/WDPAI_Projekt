@@ -62,7 +62,7 @@ function AllClasses() {
                 <br />
                 Trainer: {gc.trainer_name}
                 <br />
-                {gc.date_local}
+                Date: {gc.date_local}
                 <br />
                 Spots: {freeSpots} / {gc.capacity}
                 <br />

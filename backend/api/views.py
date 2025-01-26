@@ -7,10 +7,10 @@ from rest_framework.response import Response
 from django.db.models import Q
 from rest_framework.exceptions import ValidationError
 from django.utils import timezone
-
+from django.db import transaction
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
-
+from datetime import datetime, timedelta
 from .permissions import AdminRequired, TrainerRequired
 from .models import CustomUser, MembershipPlan, Membership, GroupClass, Trainer
 from .serializers import (
@@ -33,6 +33,8 @@ class RegisterUserView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
 
 
+from rest_framework_simplejwt.tokens import RefreshToken
+
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def google_login(request):
@@ -40,7 +42,6 @@ def google_login(request):
     if not token:
         return Response({"error": "Google token is missing."},
                         status=status.HTTP_400_BAD_REQUEST)
-
     from django.conf import settings
     CLIENT_ID = getattr(settings, 'GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID')
 
@@ -65,7 +66,16 @@ def google_login(request):
             user.set_password(CustomUser.objects.make_random_password())
             user.save()
 
-        return Response(CustomUserSerializer(user).data)
+        # Teraz generujemy tokeny JWT
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+
+        return Response({
+            "access": access_token,
+            "refresh": refresh_token,
+            "user": CustomUserSerializer(user).data
+        }, status=200)
 
     except ValueError:
         return Response({"error": "Invalid Google token."},
@@ -108,36 +118,27 @@ class MembershipViewSet(viewsets.ModelViewSet):
             return [AdminRequired()]
 
     def get_queryset(self):
-        """
-        Zwracamy wyłącznie aktywne membershipy należące do aktualnego użytkownika
-        (nawet jeśli jest adminem czy trenerem).
-        Nie chcemy pokazywać membershipów innych osób ani membershipów nieaktywnych.
-        """
         user = self.request.user
         now = timezone.now().date()
-
-        # membership aktywny => start_date <= today < end_date (lub end_date == None)
-        # ponieważ w modelu: is_active => (start_date <= now < end_date) lub end_date=None
-        # Ale musimy to odtworzyć w filtrze bazy (bo is_active to property).
         return Membership.objects.filter(
-            user=user,
-            start_date__lte=now
+            user=user
         ).filter(
             Q(end_date__isnull=True) | Q(end_date__gt=now)
-        )
+        ).order_by('-start_date')
 
     def perform_create(self, serializer):
-        # Blokada kupna membershipu przez trenera (jeśli nie jest superuserem)
-        if self.request.user.is_trainer and not self.request.user.is_superuser:
-            raise ValidationError("Trainers cannot buy memberships.")
+        user = self.request.user
+        now = timezone.now().date()
+        future_or_active = Membership.objects.filter(
+        user=user
+        ).filter(
+        Q(end_date__isnull=True) | Q(end_date__gt=now)
+        )
+        if future_or_active.exists():
+            raise ValidationError("You already have a membership pending or active.")
 
-        # Sprawdzamy, czy user ma jakikolwiek aktywny membership
-        existing_active = self.get_queryset()  # Już zawęża do aktywnych usera
-        if existing_active.exists():
-            raise ValidationError("You already have an active membership. End it first.")
+        serializer.save(user=user)
 
-        # Tworzymy membership
-        serializer.save(user=self.request.user)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def end(self, request, pk=None):
@@ -167,27 +168,9 @@ class GroupClassViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        """
-        Zwracamy tylko zajęcia w przyszłości (date_time >= teraz)
-        i tylko takie, w których current user jest uczestnikiem (attendees)
-        lub ich trenerem (trainer).
-        Dzięki temu:
-         - user nie widzi starych zajęć
-         - user nie widzi cudzych zajęć
-         - trener widzi tylko swoje
-        """
-        user = self.request.user
         now = timezone.now()
+        return GroupClass.objects.filter(date_time__gte=now)
 
-        # Filtrujemy do date_time >= now:
-        future_classes = GroupClass.objects.filter(date_time__gte=now)
-
-        # Dla trenera -> cokolwiek trenował lub dołączył
-        # Dla zwykłego usera -> dołączył 
-        # (jeśli chcesz żeby zwykły user widział wszystkie future classes i mógł się zapisać, to musisz to zmienić)
-        return future_classes.filter(
-            Q(trainer=user) | Q(attendees=user)
-        )
 
     def perform_create(self, serializer):
         # Tworzenie zajęć => trainer = request.user

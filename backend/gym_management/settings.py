@@ -118,4 +118,4 @@ SIMPLE_JWT = {
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True
 
-GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com' # ?????????
+GOOGLE_CLIENT_ID = '666492394731-iq3kv2qhapqrcl1sd9cn3tier6rggmcd.apps.googleusercontent.com' # ?????????

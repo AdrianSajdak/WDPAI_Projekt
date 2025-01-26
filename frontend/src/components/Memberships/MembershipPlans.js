@@ -204,19 +204,6 @@ function MembershipPlans() {
                       />
                     </label>
                     <br />
-                    <label>
-                      Number of months:
-                      <br />
-                      <input
-                        type="number"
-                        value={months}
-                        onChange={(e) => setMonths(Number(e.target.value))}
-                        min={1}
-                        max={12}
-                        required
-                      />
-                    </label>
-                    <br />
                     <button
                       style={{ marginTop: '0.5rem' }}
                       onClick={() => handlePurchase(plan.id)}
