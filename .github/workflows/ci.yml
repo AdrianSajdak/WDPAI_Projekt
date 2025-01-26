@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]  # Uruchamiaj, gdy push na main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # 1. Python setup
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run backend tests
+      run: |
+        cd backend
+        python manage.py test
+
+    # 2. Node setup (for React)
+    - name: Set up Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: Install front-end dependencies
+      run: npm install
+      working-directory: ./frontend
+
+    - name: Build front-end
+      run: npm run build
+      working-directory: ./frontend
+
+    - name: Run front-end tests
+      run: npm test
+      working-directory: ./frontend
