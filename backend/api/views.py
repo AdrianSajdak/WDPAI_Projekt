@@ -43,7 +43,8 @@ def google_login(request):
         return Response({"error": "Google token is missing."},
                         status=status.HTTP_400_BAD_REQUEST)
     from django.conf import settings
-    CLIENT_ID = getattr(settings, 'GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID')
+
+    CLIENT_ID = settings.GOOGLE_CLIENT_ID
 
     try:
         idinfo = id_token.verify_oauth2_token(

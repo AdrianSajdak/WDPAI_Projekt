@@ -141,20 +141,6 @@ function Register() {
 
           <button type="submit" className="btn-green">SIGN UP</button>
         </form>
-
-        <div className="divider">
-          <span>or</span>
-        </div>
-        <p className="login-with">log in with</p>
-        <div className="social-icons">
-          <button className="btn-social">
-            <img src={require('../../images/akar-icons_google-contained-fill.png')}></img>
-          </button>
-          <button className="btn-social">
-          <img src={require('../../images/akar-icons_facebook-fill.png')}></img>
-
-          </button>
-        </div>
       </div>
     </div>
   );

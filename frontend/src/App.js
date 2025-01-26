@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import Navbar from './components/Layout/Navbar';
 import Footer from './components/Layout/Footer';
 
@@ -19,8 +20,11 @@ import AllClasses from './components/Classes/AllClasses';
 import MyClasses from './components/Classes/MyClasses';    
 import MembershipPlans from './components/Memberships/MembershipPlans';
 
+const GOOGLE_CLIENT_ID = '666492394731-iq3kv2qhapqrcl1sd9cn3tier6rggmcd.apps.googleusercontent.com';
+
 function App() {
   return (
+  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     <div id="root">
       <Navbar />
       {/* main-content ensures the footer is pushed down */}
@@ -92,6 +96,7 @@ function App() {
       </div>
       <Footer />
     </div>
+  </GoogleOAuthProvider>
   );
 }
 

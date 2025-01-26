@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google'; 
 import useAuth from '../../hooks/useAuth';
 import '../../styles/Login.css';
 
 function Login() {
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -26,6 +27,33 @@ function Login() {
       [e.target.name]: e.target.value,
     }));
   };
+
+  // Google login - z biblioteki @react-oauth/google
+  const handleGoogleSuccess = async (credentialResponse) => {
+    console.log('credentialResponse = ', credentialResponse);
+    try {
+      const googleToken = credentialResponse.credential;
+      if (!googleToken) {
+        setError('No credential from Google');
+        return;
+      }
+      const success = await googleLogin(googleToken);
+      if (success) navigate('/dashboard');
+      else setError('Google login failed (server).');
+    } catch (err) {
+      console.error(err);
+      setError('Google login error.');
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError('Google login error. (Popup closed?)');
+  };
+
+  const googleAuth = GoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: handleGoogleError,
+  });
 
   return (
     <div className="login-container">
@@ -66,17 +94,10 @@ function Login() {
         <div className="divider">
           <span>or</span>
         </div>
-        <p className="login-with">log in with</p>
-
-        <div className="social-icons">
-          <button className="btn-social">
-            <img src={require('../../images/akar-icons_google-contained-fill.png')}></img>
-          </button>
-          <button className="btn-social">
-          <img src={require('../../images/akar-icons_facebook-fill.png')}></img>
-
-          </button>
-        </div>
+        <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+            />
       </div>
     </div>
   );
