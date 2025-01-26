@@ -26,14 +26,14 @@ function Home() {
           The platform for managing gym memberships and group classes.
         </p>
 
-        <section style={{ marginTop: '2rem' }}>
+        <section>
           <h2>Available Membership Plans</h2>
           {plans.length === 0 ? (
             <p>No plans available.</p>
           ) : (
-            <ul style={{ listStyle: 'none', padding: 0 }}>
+            <ul>
               {plans.map((p) => (
-                <li key={p.id} style={{ margin: '1rem 0' }}>
+                <li key={p.id}>
                   <strong>{p.name}</strong> – {p.price} PLN (
                   {p.duration_days} days)
                   <br />

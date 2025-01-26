@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosClient from '../api/axiosClient';
 import useAuth from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
+import '../styles/Home.css';
 
 
 function Dashboard() {
@@ -40,20 +41,20 @@ function Dashboard() {
   }, [user]);
 
   return (
-    <div style={{ textAlign: 'center' }}>
+    <div>
       <h2>User Dashboard</h2>
       {user ? (
         <>
           <p>Hello, {user.username}!</p>
 
-          <section style={{ marginBottom: '2rem' }}>
+          <section>
             <h3>My Memberships</h3>
             {myMemberships.length === 0 ? (
               <p>No memberships.</p>
             ) : (
-              <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+              <ul>
                 {myMemberships.map((m) => (
-                  <li key={m.id} style={{ margin: '1rem 0' }}>
+                  <li key={m.id} >
                     <strong>Plan:</strong> {m.plan_name} <br />
                     <strong>From:</strong> {m.start_date} - <strong>To:</strong> {m.end_date}                    
                     {m.is_active ? (
@@ -67,14 +68,14 @@ function Dashboard() {
             )}
           </section>
 
-          <section style={{ marginBottom: '2rem' }}>
+          <section>
   <h3>My Classes</h3>
   {myClasses.length === 0 ? (
     <p>You are not enrolled in any classes.</p>
   ) : (
-    <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+    <ul>
       {myClasses.map((gc) => (
-        <li key={gc.id} style={{ margin: '1rem 0' }}>
+        <li key={gc.id}>
           <strong>{gc.name}</strong>
           <br />
           Trainer: {gc.trainer_name}       {/* <-- z serializer */}

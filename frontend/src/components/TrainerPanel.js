@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../api/axiosClient';
 import useAuth from '../hooks/useAuth';
+import '../styles/Home.css';
+
 
 function TrainerPanel() {
   const { user } = useAuth();
@@ -115,13 +117,6 @@ function TrainerPanel() {
         <h3>Create a New Class</h3>
         <form
           onSubmit={createClass}
-          style={{
-            display: 'inline-flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            gap: '0.5rem',
-            margin: '0 auto',
-          }}
         >
           <label>
             Class Name:
@@ -134,7 +129,7 @@ function TrainerPanel() {
               required
             />
           </label>
-
+          <br />
           <label>
             Description:
             <br />
@@ -145,7 +140,7 @@ function TrainerPanel() {
               rows="3"
             />
           </label>
-
+          <br />
           {/* Jedno pole - data i godzina */}
           <label>
             Date & Time:
@@ -158,7 +153,7 @@ function TrainerPanel() {
               required
             />
           </label>
-
+          <br />
           <label>
             Class type:
             <br />
@@ -171,7 +166,7 @@ function TrainerPanel() {
               <option value="individual">Individual</option>
             </select>
           </label>
-
+          <br />
           {/* Tylko przy group dajemy capacity */}
           {formData.class_type === 'group' ? (
             <label>
@@ -202,11 +197,10 @@ function TrainerPanel() {
               </select>
             </label>
           )}
-
+          <br />
           <button
             type="submit"
             className="btn-green"
-            style={{ marginTop: '1rem' }}
           >
             Create Class
           </button>
@@ -220,7 +214,7 @@ function TrainerPanel() {
         ) : (
           <ul>
             {myClasses.map((gc) => (
-              <li key={gc.id} style={{ marginBottom: '1rem' }}>
+              <li key={gc.id}>
                 <strong>{gc.name}</strong>
                 <br />
                 Trainer: {gc.trainer_name}

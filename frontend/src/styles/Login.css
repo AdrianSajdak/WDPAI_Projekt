@@ -6,7 +6,6 @@
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 80px);
-  background-color: #fff;
   padding: 1rem;
 }
 
@@ -105,8 +104,9 @@
   justify-content: center;
   border-radius: 50%;
 }
+/*
 .google,
 .facebook {
   background-color: white;
   color: white;
-}
+}*/

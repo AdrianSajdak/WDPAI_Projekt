@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../api/axiosClient';
+import '../styles/Home.css';
 
 function AdminPanel() {
   const [trainers, setTrainers] = useState([]);
@@ -165,21 +166,14 @@ function AdminPanel() {
   }
 
   return (
-    <div style={{ textAlign: 'center' }}>
+    <div>
       <h2>Admin Panel</h2>
 
       {/* Sekcja tworzenia MembershipPlan */}
-      <section style={{ margin: '2rem 0' }}>
+      <section>
         <h3>Create Membership Plan</h3>
         <form
           onSubmit={addMembershipPlan}
-          style={{
-            display: 'inline-flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            gap: '0.5rem',
-            margin: '0 auto',
-          }}
         >
           <label>
             Plan Name:
@@ -192,7 +186,7 @@ function AdminPanel() {
               required
             />
           </label>
-
+          <br/>
           <label>
             Description:
             <br />
@@ -203,7 +197,7 @@ function AdminPanel() {
               rows={3}
             />
           </label>
-
+          <br />
           <label>
             Price (monthly):
             <br />
@@ -216,7 +210,7 @@ function AdminPanel() {
               required
             />
           </label>
-
+          <br />
           <label>
             Duration (days):
           <br />
@@ -227,24 +221,18 @@ function AdminPanel() {
             onChange={handlePlanChange}
           />
           </label>
-          <button type="submit" className="btn-green" style={{ marginTop: '1rem' }}>
+          <br />
+          <button type="submit" className="btn-green">
             Add Plan
           </button>
         </form>
       </section>
 
       {/* Sekcja do tworzenia NOWEGO TRENERA */}
-      <section style={{ margin: '2rem 0' }}>
+      <section>
         <h3>Create Trainer</h3>
         <form
           onSubmit={addTrainer}
-          style={{
-            display: 'inline-flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            gap: '0.5rem',
-            margin: '0 auto',
-          }}
         >
           <label>
             Select existing user:
@@ -263,7 +251,7 @@ function AdminPanel() {
               ))}
             </select>
           </label>
-
+          <br />
           <label>
             Specialization:
             <br />
@@ -274,7 +262,7 @@ function AdminPanel() {
               onChange={handleTrainerChange}
             />
           </label>
-
+          <br />
           <label>
             Photo (optional):
             <br />
@@ -285,8 +273,8 @@ function AdminPanel() {
               onChange={handleTrainerChange}
             />
           </label>
-
-          <button type="submit" className="btn-green" style={{ marginTop: '1rem' }}>
+          <br />
+          <button type="submit" className="btn-green">
             Add Trainer
           </button>
         </form>
@@ -295,9 +283,9 @@ function AdminPanel() {
       {/* Lista istniejących trenerów */}
 <section>
   <h3>Existing Trainers</h3>
-  <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+  <ul>
     {trainers.map((tr) => (
-      <li key={tr.id} style={{ marginBottom: '1rem' }}>
+      <li key={tr.id}>
         <strong>
           {tr.first_name} {tr.last_name}
         </strong>
@@ -322,9 +310,9 @@ function AdminPanel() {
       {/* Membership Plans (lista) */}
       <section>
         <h3>Membership Plans</h3>
-        <ul style={{ listStyle: 'none' }}>
+        <ul>
           {plans.map((pl) => (
-            <li key={pl.id} style={{ marginBottom: '1rem' }}>
+            <li key={pl.id}>
               <strong>{pl.name}</strong> – {pl.price} PLN
               <br />
               {pl.description}
@@ -338,9 +326,9 @@ function AdminPanel() {
       {/* All Classes */}
 <section>
   <h3>All Classes</h3>
-  <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+  <ul>
     {groupClasses.map((gc) => (
-      <li key={gc.id} style={{ marginBottom: '1rem' }}>
+      <li key={gc.id}>
         <strong>{gc.name}</strong>
         <br />
         Trainer: {gc.trainer_name}

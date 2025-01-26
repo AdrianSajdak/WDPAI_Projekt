@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axiosClient from '../api/axiosClient';
 import { jwtDecode } from 'jwt-decode';  // <-- default import, bez klamerek
+import '../styles/Home.css';
 
 export const AuthContext = createContext();
 
