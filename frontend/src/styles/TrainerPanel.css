@@ -1,6 +1,5 @@
-/* src/components/Auth/Register.css */
-
-.register-container {
+/* Container for the trainer page */
+.trainer-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -8,28 +7,20 @@
     padding: 1rem;
   }
   
-  .register-box {
+  .trainer-box {
     width: 400px;
     max-width: 90%;
     text-align: center;
+    border-radius: 8px;
     padding: 2rem;
-    margin: 0 auto;
   }
   
-  /* Icon area */
-  .register-icon {
+  /* Icon / logo area */
+  .trainer-icon {
     margin-bottom: 1rem;
-  }
-  .register-icon svg {
-    width: 80px;
-    height: 80px;
   }
   
-  /* Success/error messages */
-  .success {
-    color: green;
-    margin-bottom: 1rem;
-  }
+  /* Error message */
   .error {
     color: red;
     margin-bottom: 1rem;
@@ -48,6 +39,8 @@
     color: #6bae75;
     font-size: 1.2rem;
   }
+  
+  /* Input element */
   .input-group input {
     width: 100%;
     padding: 0.6rem 0.6rem 0.6rem 2.5rem;
@@ -57,30 +50,7 @@
     border-bottom: 2px solid #6bae75;
   }
   
-  /* Terms checkbox group */
-  .terms-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    justify-content: center;
-  }
-  .terms-group input[type='checkbox'] {
-    margin-right: 0.5rem;
-  }
-  
-  /* Optional trainer group
-  .trainer-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    justify-content: center;
-  }
-  .trainer-group input[type='checkbox'] {
-    margin-right: 0.5rem;
-  }
-  */
-  
-  /* Button styles */
+  /* Main green button override */
   .btn-green {
     background-color: #B3E4A8;
     color: #333;
@@ -105,11 +75,11 @@
     font-size: 0.9rem;
   }
   
-  /* "login with" text */
-  .login-with {
+  /* "trainer with" text */
+  .trainer-with {
+    margin: 0;
     font-size: 0.9rem;
     color: #666;
-    margin-bottom: 0.5rem;
   }
   
   /* Social icons container */
@@ -119,6 +89,8 @@
     gap: 1.5rem;
     margin-top: 1rem;
   }
+  
+  /* Round social button style */
   .btn-social {
     width: 48px;
     height: 48px;
@@ -129,5 +101,10 @@
     justify-content: center;
     border-radius: 50%;
   }
-
+  /*
+  .google,
+  .facebook {
+    background-color: white;
+    color: white;
+  }*/
   

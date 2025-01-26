@@ -60,7 +60,7 @@ function Register() {
     <div className="register-container">
       <div className="register-box">
         <div className="register-icon">
-          {/* optional icon */}
+        <img src={require('../../images/logo.png')} alt="logo"></img>
           <h2>Register</h2>
         </div>
 
@@ -147,11 +147,12 @@ function Register() {
         </div>
         <p className="login-with">log in with</p>
         <div className="social-icons">
-          <button className="btn-social google">
-            {/* Google icon */}
+          <button className="btn-social">
+            <img src={require('../../images/akar-icons_google-contained-fill.png')}></img>
           </button>
-          <button className="btn-social facebook">
-            {/* Facebook icon */}
+          <button className="btn-social">
+          <img src={require('../../images/akar-icons_facebook-fill.png')}></img>
+
           </button>
         </div>
       </div>

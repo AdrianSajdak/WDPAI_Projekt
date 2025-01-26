@@ -31,7 +31,7 @@ function Login() {
     <div className="login-container">
       <div className="login-box">
         <div className="login-icon">
-          {/* optional logo or icon */}
+        <img src={require('../../images/logo.png')} alt="logo"></img>
           <h2>Login</h2>
         </div>
         {error && <p className="error">{error}</p>}
@@ -69,11 +69,12 @@ function Login() {
         <p className="login-with">log in with</p>
 
         <div className="social-icons">
-          <button className="btn-social google">
-            {/* Google SVG icon */}
+          <button className="btn-social">
+            <img src={require('../../images/akar-icons_google-contained-fill.png')}></img>
           </button>
-          <button className="btn-social facebook">
-            {/* Facebook SVG icon */}
+          <button className="btn-social">
+          <img src={require('../../images/akar-icons_facebook-fill.png')}></img>
+
           </button>
         </div>
       </div>

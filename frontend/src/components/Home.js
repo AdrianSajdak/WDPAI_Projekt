@@ -21,6 +21,7 @@ function Home() {
   return (
     <div className="home-container">
       <div className="home-content">
+      <img src={require('../images/logo.png')} alt="logo"></img>
         <h1 className="home-title">Welcome to GymManagement!</h1>
         <p className="home-subtitle">
           The platform for managing gym memberships and group classes.

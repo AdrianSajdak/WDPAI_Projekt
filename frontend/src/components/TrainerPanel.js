@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import axiosClient from '../api/axiosClient';
 import useAuth from '../hooks/useAuth';
 import '../styles/Home.css';
+import '../styles/TrainerPanel.css'
 
 
 function TrainerPanel() {
@@ -109,16 +110,17 @@ function TrainerPanel() {
   };
 
   return (
-    <div style={{ textAlign: 'center' }}>
+    <div className='trainer-container'>
+      <div className='trainer-box'>
       <h2>Trainer Panel</h2>
       <p>Hello, {user?.username}! Create and manage your classes here.</p>
 
-      <section style={{ marginBottom: '2rem' }}>
+      <div>
         <h3>Create a New Class</h3>
         <form
           onSubmit={createClass}
         >
-          <label>
+          <div className="input-group">
             Class Name:
             <br />
             <input
@@ -128,23 +130,21 @@ function TrainerPanel() {
               onChange={handleChange}
               required
             />
-          </label>
+          </div>
           <br />
-          <label>
+          <div className='input-group'>
             Description:
-            <br />
-            <textarea
+            <input
+              type="text"
               name="description"
               value={formData.description}
               onChange={handleChange}
-              rows="3"
             />
-          </label>
+          </div>
           <br />
           {/* Jedno pole - data i godzina */}
-          <label>
+          <div className='input-group'>
             Date & Time:
-            <br />
             <input
               type="datetime-local"
               name="date_time"
@@ -152,11 +152,8 @@ function TrainerPanel() {
               onChange={handleChange}
               required
             />
-          </label>
-          <br />
-          <label>
-            Class type:
-            <br />
+          </div>
+          <div className='input-group'>
             <select
               name="class_type"
               value={formData.class_type}
@@ -165,22 +162,20 @@ function TrainerPanel() {
               <option value="group">Group</option>
               <option value="individual">Individual</option>
             </select>
-          </label>
-          <br />
+          </div>
           {/* Tylko przy group dajemy capacity */}
           {formData.class_type === 'group' ? (
-            <label>
+            <div className='input-group'>
               Capacity:
-              <br />
               <input
                 type="number"
                 name="capacity"
                 value={formData.capacity}
                 onChange={handleChange}
               />
-            </label>
+            </div>
           ) : (
-            <label>
+            <div className='input-group'>
               Select User (for 1-on-1):
               <br />
               <select
@@ -195,9 +190,8 @@ function TrainerPanel() {
                   </option>
                 ))}
               </select>
-            </label>
+            </div>
           )}
-          <br />
           <button
             type="submit"
             className="btn-green"
@@ -205,9 +199,9 @@ function TrainerPanel() {
             Create Class
           </button>
         </form>
-      </section>
+      </div>
 
-      <section>
+      <div>
         <h3>My Created Classes</h3>
         {myClasses.length === 0 ? (
           <p>You have not created any classes yet.</p>
@@ -231,7 +225,8 @@ function TrainerPanel() {
             ))}
           </ul>
         )}
-      </section>
+      </div>
+      </div>
     </div>
   );
 }
