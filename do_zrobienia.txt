@@ -3,6 +3,5 @@ figme przerobić zeby były wszystkie strony wyglądały jak te z css
 
 Do ogarnięcia:
 Swagger - zrobione, przetestowac
-Github Actions - jest zrobione w katalogu na githubie .github/workflows i tam jest plik w którym sie uruchamiaja te testy 
-nie wiem mozna moze cos dopisac/sprawdzic czy jest git
+
 
