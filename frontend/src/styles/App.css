@@ -18,20 +18,15 @@ body {
   box-sizing: inherit;
 }
 
-/* #root as a flex container: 
-   We'll stretch it to fill 100% of viewport
-   so we can push the footer to the bottom */
 #root {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-/* The main content flex:1 so the footer 
-   stays at the bottom */
 .main-content {
   flex: 1;
-  text-align: center; /* center text by default */
+  text-align: center;
   padding: 20px;
 }
 

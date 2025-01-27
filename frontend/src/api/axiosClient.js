@@ -1,12 +1,9 @@
-// src/api/axiosClient.js
-
 import axios from 'axios';
 
 const axiosClient = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api', // <-- prefiks /api
+  baseURL: 'http://127.0.0.1:8000/api',
 });
 
-// Interceptor dołączający token JWT (o ile jest w sessionStorage)
 axiosClient.interceptors.request.use(
   (config) => {
     const token = sessionStorage.getItem('access_token');

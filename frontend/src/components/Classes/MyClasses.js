@@ -1,4 +1,3 @@
-// src/components/Classes/MyClasses.js
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../../api/axiosClient';
 import useAuth from '../../hooks/useAuth';
@@ -16,7 +15,6 @@ function MyClasses() {
 
   const fetchMyClasses = async () => {
     try {
-      // backend zwróci TYLKO przyszłe klasy, w których user jest attendees/trainer
       const res = await axiosClient.get('/classes/');
       setMyClasses(res.data);
     } catch (err) {

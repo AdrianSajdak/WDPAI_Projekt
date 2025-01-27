@@ -27,16 +27,13 @@ function App() {
   <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     <div id="root">
       <Navbar />
-      {/* main-content ensures the footer is pushed down */}
       <div className="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
 
-          {/* Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Protected routes */}
           <Route
             path="/dashboard"
             element={
@@ -62,7 +59,6 @@ function App() {
             }
           />
 
-          {/* Admin route */}
           <Route
             path="/admin-panel"
             element={
@@ -72,7 +68,6 @@ function App() {
             }
           />
 
-          {/* Trainer route */}
           <Route
             path="/trainer-panel"
             element={

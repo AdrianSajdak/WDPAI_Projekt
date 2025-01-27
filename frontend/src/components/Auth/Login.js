@@ -28,7 +28,6 @@ function Login() {
     }));
   };
 
-  // Google login - z biblioteki @react-oauth/google
   const handleGoogleSuccess = async (credentialResponse) => {
     console.log('credentialResponse = ', credentialResponse);
     try {

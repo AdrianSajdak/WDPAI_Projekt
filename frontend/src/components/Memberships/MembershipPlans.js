@@ -1,5 +1,3 @@
-// src/components/Memberships/MembershipPlans.js
-
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../../api/axiosClient';
 import useAuth from '../../hooks/useAuth';
@@ -10,10 +8,8 @@ function MembershipPlans() {
   const [plans, setPlans] = useState([]);
   const [error, setError] = useState('');
 
-  // Stan do przechowywania "czy user ma aktywny membership"
   const [activeMembership, setActiveMembership] = useState(null);
 
-  // Stan do wybranego planu, startDate i months do kupna
   const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [startDate, setStartDate] = useState('');
   const [months, setMonths] = useState(1);
@@ -23,7 +19,6 @@ function MembershipPlans() {
     fetchActiveMembership();
   }, [user]);
 
-  // Jeśli user NIE ma aktywnego membership, pobieramy listę planów
   useEffect(() => {
     if (user && !activeMembership) {
       fetchPlans();
@@ -33,7 +28,7 @@ function MembershipPlans() {
   const fetchActiveMembership = async () => {
     try {
       const res = await axiosClient.get('/memberships/');
-      // Szukamy membershipu, który ma is_active = true
+
       const active = res.data.find((m) => m.is_active === true);
       if (active) {
         setActiveMembership(active);
@@ -56,14 +51,12 @@ function MembershipPlans() {
     }
   };
 
-  // Gdy user klika w "Select" plan
   const handleSelectPlan = (planId) => {
     setSelectedPlanId(planId);
     setStartDate('');
     setMonths(1);
   };
 
-  // Gdy user potwierdza kupno planu
   const handlePurchase = async (planId) => {
     try {
       if (!startDate) {
@@ -82,9 +75,8 @@ function MembershipPlans() {
       });
 
       alert('Membership purchased successfully!');
-      // Po kupnie odświeżamy membership
       fetchActiveMembership();
-      // Reset
+
       setSelectedPlanId(null);
       setStartDate('');
       setMonths(1);
@@ -93,7 +85,6 @@ function MembershipPlans() {
       if (err.response?.data?.detail) {
         setError(err.response.data.detail);
       } else if (err.response?.data) {
-        // Może ValidationError w formie dict
         const msg = Object.values(err.response.data).join(' ');
         setError(msg || 'Error purchasing membership plan.');
       } else {
@@ -102,12 +93,10 @@ function MembershipPlans() {
     }
   };
 
-  // Kończenie aktywnego membership
   const handleEndMembership = async (membershipId) => {
     try {
       await axiosClient.post(`/memberships/${membershipId}/end/`);
       alert('Membership ended.');
-      // Re-fetch, żeby odświeżyć stan:
       fetchActiveMembership();
     } catch (err) {
       console.error(err);
@@ -115,19 +104,15 @@ function MembershipPlans() {
     }
   };
 
-  // Jeśli brak usera => loading
   if (!user) {
     return <p>Loading user...</p>;
   }
 
-  // Jeżeli mamy błąd globalny
   if (error) {
     return <div style={{ color: 'red', textAlign: 'center' }}>{error}</div>;
   }
 
-  // Sprawdzamy, czy user ma aktywne membership
   if (activeMembership) {
-    // Wyświetlamy tylko to membership i przycisk end
     return (
       <div style={{ textAlign: 'center' }}>
         <h2>Your Active Membership</h2>
@@ -152,7 +137,6 @@ function MembershipPlans() {
     );
   }
 
-  // W przeciwnym razie user nie ma aktywnego membership => wyświetlamy listę planów
   return (
     <div style={{ textAlign: 'center' }}>
       <h2>Available Membership Plans</h2>

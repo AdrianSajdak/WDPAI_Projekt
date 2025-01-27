@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axiosClient from '../api/axiosClient';
-import { jwtDecode } from 'jwt-decode';  // <-- default import, bez klamerek
+import { jwtDecode } from 'jwt-decode';
 import '../styles/Home.css';
 
 export const AuthContext = createContext();
@@ -11,36 +11,29 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Pobiera aktualnego usera z /me/
   const fetchCurrentUser = async () => {
     try {
       const res = await axiosClient.get('/me/');
       setUser(res.data);
     } catch (err) {
       console.error('fetchCurrentUser error:', err);
-      // w razie błędu, user = null
       setUser(null);
     }
   };
 
-  // Pierwszy effect: sprawdzamy sessionStorage, dekodujemy token
   useEffect(() => {
     const token = sessionStorage.getItem('access_token');
     if (!token) {
-      // brak tokena => nie logujemy
       setLoading(false);
       return;
     }
 
     try {
       const decoded = jwtDecode(token);
-      // Sprawdzamy czy token wygasł
       if (decoded.exp * 1000 < Date.now()) {
-        // exp jest w sekundach, Date.now() w ms
         logout();
         setLoading(false);
       } else {
-        // token ważny => setAccessToken i fetchUser
         setAccessToken(token);
         fetchCurrentUser().finally(() => setLoading(false));
       }
@@ -51,7 +44,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Logowanie z backendu (np. /api/token/) – zapis tokenów
   const login = async (username, password) => {
     try {
       setError('');
@@ -73,7 +65,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Wylogowanie
   const logout = () => {
     sessionStorage.removeItem('access_token');
     sessionStorage.removeItem('refresh_token');
@@ -82,14 +73,12 @@ export const AuthProvider = ({ children }) => {
     setError('');
   };
 
-  // Google login
   const googleLogin = async (googleToken) => {
     try {
       setError('');
       const response = await axiosClient.post('/google-login/', {
         token: googleToken,
       });
-      // Jeśli backend zwraca { access, refresh }
       const { access, refresh } = response.data;
       sessionStorage.setItem('access_token', access);
       sessionStorage.setItem('refresh_token', refresh);

@@ -32,7 +32,6 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-    # Pobieramy dane
         first_name = validated_data.get('first_name', '')
         last_name = validated_data.get('last_name', '')
 
@@ -118,14 +117,11 @@ class TrainerSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = validated_data['user']
-        # Ustawiamy user.is_trainer = True
         user.is_trainer = True
         user.save()
 
-        # Tworzymy obiekt Trainer
         trainer = Trainer.objects.create(**validated_data)
 
-        # Tworzymy "trainer membership" w razie potrzeby
         self._create_trainer_membership(user)
 
         return trainer
@@ -134,16 +130,14 @@ class TrainerSerializer(serializers.ModelSerializer):
         from .models import MembershipPlan, Membership
         import datetime
 
-        # Szukamy lub tworzymy plan "Trainer Membership"
         plan, _ = MembershipPlan.objects.get_or_create(
             name="Trainer Membership",
             defaults={
                 "description": "Membership for trainers (unlimited)",
                 "price": 0,
-                "duration_days": 999999  # może być 999999 lub cokolwiek
+                "duration_days": 999999
             }
         )
-        # Ustawiamy membership "bez końca" (end_date=None) lub daleka data
         Membership.objects.create(
             user=user,
             plan=plan,

@@ -67,7 +67,6 @@ def google_login(request):
             user.set_password(CustomUser.objects.make_random_password())
             user.save()
 
-        # Teraz generujemy tokeny JWT
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
@@ -85,14 +84,12 @@ def google_login(request):
 
 # -------------------------------------------------
 #  MEMBERSHIP PLANS
-#   (Ukrycie "Trainer Membership" w listach)
 # -------------------------------------------------
 class MembershipPlanViewSet(viewsets.ModelViewSet):
     serializer_class = MembershipPlanSerializer
     
     def get_queryset(self):
         qs = MembershipPlan.objects.all()
-        # Ukrywamy plan "Trainer Membership" w listach
         if self.action == 'list':
             qs = qs.exclude(name="Trainer Membership")
         return qs
@@ -112,7 +109,6 @@ class MembershipViewSet(viewsets.ModelViewSet):
     serializer_class = MembershipSerializer
 
     def get_permissions(self):
-        # Dodajemy 'end' do listy akcji dostępnych dla zalogowanego usera
         if self.action in ['create', 'list', 'retrieve', 'end']:
             return [permissions.IsAuthenticated()]
         else:
@@ -145,12 +141,9 @@ class MembershipViewSet(viewsets.ModelViewSet):
     def end(self, request, pk=None):
         membership = self.get_object()
 
-        # w get_queryset już jest user=..., więc membership musi należeć do request.user
-        # ale jakby co:
         if membership.user != request.user and not request.user.is_superuser:
             return Response({"detail": "Not allowed."}, status=status.HTTP_403_FORBIDDEN)
 
-        # Ustawiamy end_date = today => membership staje się nieaktywny
         membership.end_date = timezone.now().date()
         membership.save()
         return Response({"detail": "Membership ended."}, status=status.HTTP_200_OK)
@@ -174,7 +167,6 @@ class GroupClassViewSet(viewsets.ModelViewSet):
 
 
     def perform_create(self, serializer):
-        # Tworzenie zajęć => trainer = request.user
         serializer.save(trainer=self.request.user)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])

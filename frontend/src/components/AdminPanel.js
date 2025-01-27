@@ -1,5 +1,3 @@
-// src/components/AdminPanel.js
-
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../api/axiosClient';
 import '../styles/Home.css';
@@ -12,7 +10,6 @@ function AdminPanel() {
   const [users, setUsers] = useState([]);
   const [memberships, setMemberships] = useState([]);
 
-  // Dane do tworzenia nowego planu
   const [planData, setPlanData] = useState({
     name: '',
     description: '',
@@ -20,14 +17,12 @@ function AdminPanel() {
     duration_days: '',
   });
 
-  // Dane do tworzenia trenera (wybieramy istniejącego usera)
   const [trainerData, setTrainerData] = useState({
-    user_id: '',        // <-- klucz
+    user_id: '',
     specialization: '',
     photo: null,
   });
 
-  // Wszystkich userów (do selecta)
   const [allUsers, setAllUsers] = useState([]);
 
   useEffect(() => {
@@ -41,7 +36,7 @@ function AdminPanel() {
       const pRes = await axiosClient.get('/membership-plans/');
       const cRes = await axiosClient.get('/classes/');
       const uRes = await axiosClient.get('/users/');
-      const mRes = await axiosClient.get('/memberships/'); // admin - widzi wszystkie
+      const mRes = await axiosClient.get('/memberships/');
 
       setTrainers(tRes.data);
       setPlans(pRes.data);
@@ -62,7 +57,6 @@ function AdminPanel() {
     }
   };
 
-  // Tworzenie MembershipPlan
   const addMembershipPlan = async (e) => {
     e.preventDefault();
     try {
@@ -89,7 +83,6 @@ function AdminPanel() {
     }));
   };
 
-  // Tworzenie trenera
   const addTrainer = async (e) => {
     e.preventDefault();
     try {
@@ -124,7 +117,6 @@ function AdminPanel() {
     }
   };
 
-  // Usuwanie trenera
   function deleteTrainer(trainerId) {
     if (!window.confirm("Are you sure you want to delete this trainer?")) return;
     axiosClient.delete(`/trainers/${trainerId}/`)
@@ -138,7 +130,6 @@ function AdminPanel() {
       });
   }
 
-  // Usuwanie klasy
   function deleteClass(classId) {
     if (!window.confirm("Are you sure you want to delete this class?")) return;
     axiosClient.delete(`/classes/${classId}/`)
@@ -152,7 +143,6 @@ function AdminPanel() {
       });
   }
 
-  // Usuwanie planu
   function deletePlan(planId) {
     if (!window.confirm('Are you sure you want to delete this plan?')) return;
     axiosClient.delete(`/membership-plans/${planId}/`)
@@ -170,7 +160,6 @@ function AdminPanel() {
     <div className="admin-container">
       <div className='admin-box'>
         <h2>Admin Panel</h2>
-        {/* Sekcja tworzenia MembershipPlan */}
         <div>
           <h3>Create Membership Plan</h3>
           <form onSubmit={addMembershipPlan}>
@@ -220,7 +209,6 @@ function AdminPanel() {
           </form>
         </div>
 
-        {/* Sekcja do tworzenia NOWEGO TRENERA */}
         <div>
           <h3>Create Trainer</h3>
           <form
@@ -266,7 +254,7 @@ function AdminPanel() {
             </button>
           </form>
         </div>
-        {/* Lista istniejących trenerów */}
+
         <div>
           <h3>Existing Trainers</h3>
           <ul>
@@ -292,8 +280,6 @@ function AdminPanel() {
           </ul>
         </div>
 
-
-        {/* Membership Plans (lista) */}
         <div>
           <h3>Membership Plans</h3>
           <ul>
@@ -309,7 +295,6 @@ function AdminPanel() {
           </ul>
         </div>
 
-        {/* All Classes */}
         <div>
           <h3>All Classes</h3>
           <ul>

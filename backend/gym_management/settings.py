@@ -55,7 +55,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gym_management.wsgi.application'
 
-# Baza danych (np. PostgreSQL)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -67,7 +66,6 @@ DATABASES = {
     }
 }
 
-# Używamy customowego modelu użytkownika
 AUTH_USER_MODEL = 'api.CustomUser'
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -97,7 +95,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Django REST Framework + SimpleJWT
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -115,7 +112,6 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# CORS
 CORS_ALLOW_ALL_ORIGINS = True
 
 GOOGLE_CLIENT_ID = '666492394731-iq3kv2qhapqrcl1sd9cn3tier6rggmcd.apps.googleusercontent.com' 

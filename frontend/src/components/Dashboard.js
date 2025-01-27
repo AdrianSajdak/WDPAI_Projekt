@@ -79,9 +79,9 @@ function Dashboard() {
         <li key={gc.id}>
           <strong>{gc.name}</strong>
           <br />
-          Trainer: {gc.trainer_name}       {/* <-- z serializer */}
+          Trainer: {gc.trainer_name}
           <br />
-          Date: {gc.date_local}           {/* <-- z serializer */}
+          Date: {gc.date_local}
           <br />
           Capacity: {gc.capacity}
         </li>

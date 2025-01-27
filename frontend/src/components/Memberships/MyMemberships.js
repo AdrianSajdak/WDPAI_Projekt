@@ -1,4 +1,3 @@
-// src/components/Memberships/MyMemberships.js
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../../api/axiosClient';
 import useAuth from '../../hooks/useAuth';
@@ -17,7 +16,6 @@ function MyMemberships() {
 
   const fetchMemberships = async () => {
     try {
-      // Teraz backend i tak zwróci tylko aktywne membershipy
       const res = await axiosClient.get('/memberships/');
       setMemberships(res.data);
     } catch (err) {
@@ -29,7 +27,6 @@ function MyMemberships() {
   const handleEndMembership = async (membershipId) => {
     try {
       await axiosClient.post(`/memberships/${membershipId}/end/`);
-      // Po zakończeniu membership zniknie z get_queryset (bo nieaktywny)
       fetchMemberships();
     } catch (err) {
       console.error(err);
@@ -39,7 +36,6 @@ function MyMemberships() {
 
   if (!user) return <p>Loading...</p>;
   if (user.is_trainer && !user.is_superuser) {
-    // Może tak:
     return (
       <div>
         <h2>My Memberships</h2>
@@ -63,8 +59,6 @@ function MyMemberships() {
               <p><strong>Plan:</strong> {activeMembership.plan_name}</p>
               From: {m.start_date} – To: {m.end_date || 'None'} 
               <br />
-              {/* is_active z serializera - tu prawie zawsze true,
-                bo get_queryset filtruje, ale zostawmy. */}
               <span style={{ color: 'green' }}>Active</span>
               <br />
               <button onClick={() => handleEndMembership(m.id)}>

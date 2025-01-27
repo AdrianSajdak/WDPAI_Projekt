@@ -8,7 +8,6 @@ from datetime import date
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     is_trainer = models.BooleanField(default=False)
-    # Note: is_staff / is_superuser come from AbstractUser
 
     def __str__(self):
         return self.username
@@ -28,9 +27,6 @@ class MembershipPlan(models.Model):
         return self.name
 
 class Membership(models.Model):
-    """
-    end_date dopuszcza null, aby dać 'bezterminowe' membership
-    """
     user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
@@ -47,28 +43,21 @@ class Membership(models.Model):
     @property
     def is_active(self):
         today = timezone.now().date()
-        # Jeśli end_date jest None => bezterminowe (aktywny)
         if self.end_date is None:
             return self.start_date <= today
-        # UWAGA: warunek < end_date zamiast <= end_date
         return self.start_date <= today < self.end_date
 
     def __str__(self):
         return f"{self.user.username} - {self.plan.name}"
 
 class GroupClass(models.Model):
-    """
-    Tutaj kluczowa zmiana:
-    - Usuwamy start_time / end_time, wprowadzamy tylko date_time.
-    - end_time kasujemy całkowicie.
-    """
     CLASS_TYPES = [
         ('group', 'Group'),
         ('individual', 'Individual'),
     ]
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    date_time = models.DateTimeField()  # <-- JEDEN date+time
+    date_time = models.DateTimeField()
     capacity = models.PositiveIntegerField(default=10)
     class_type = models.CharField(
         max_length=20,

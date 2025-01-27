@@ -1,5 +1,3 @@
-// src/components/Classes/AllClasses.js
-
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../../api/axiosClient';
 import useAuth from '../../hooks/useAuth';

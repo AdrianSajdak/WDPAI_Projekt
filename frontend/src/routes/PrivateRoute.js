@@ -6,7 +6,6 @@ export default function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    // np. spinner
     return <p>Loading...</p>;
   }
   if (!user) {

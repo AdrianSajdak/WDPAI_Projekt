@@ -1,5 +1,3 @@
-// src/components/TrainerPanel.js
-
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../api/axiosClient';
 import useAuth from '../hooks/useAuth';
@@ -12,11 +10,10 @@ function TrainerPanel() {
   const [myClasses, setMyClasses] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
 
-  // Zamiast start_time i end_time, mamy tylko date_time
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    date_time: '',  // <-- single field
+    date_time: '',
     capacity: 10,
     class_type: 'group',
     selected_user: '',
@@ -30,7 +27,7 @@ function TrainerPanel() {
   const fetchMyClasses = async () => {
     try {
       const res = await axiosClient.get('/classes/');
-      // filter: only classes where trainer == user.id
+
       const trainerClasses = res.data.filter(gc => gc.trainer === user.id);
       setMyClasses(trainerClasses);
     } catch (err) {
@@ -61,17 +58,15 @@ function TrainerPanel() {
       let postData = {
         name: formData.name,
         description: formData.description,
-        date_time: formData.date_time, // <-- JEDNO pole
+        date_time: formData.date_time,
         class_type: formData.class_type,
       };
 
       if (formData.class_type === 'group') {
         postData.capacity = Number(formData.capacity);
       } else {
-        // individual
         postData.capacity = 1;
         if (formData.selected_user) {
-          // automatycznie doda uczestnika (opcjonalnie)
           postData.attendees = [Number(formData.selected_user)];
         }
       }
@@ -142,7 +137,6 @@ function TrainerPanel() {
             />
           </div>
           <br />
-          {/* Jedno pole - data i godzina */}
           <div className='input-group'>
             Date & Time:
             <input
@@ -163,7 +157,6 @@ function TrainerPanel() {
               <option value="individual">Individual</option>
             </select>
           </div>
-          {/* Tylko przy group dajemy capacity */}
           {formData.class_type === 'group' ? (
             <div className='input-group'>
               Capacity:
@@ -213,7 +206,6 @@ function TrainerPanel() {
                 <br />
                 Trainer: {gc.trainer_name}
                 <br />
-                {/* Wyświetlamy jedną datę np. "date_local" z serializer */}
                 {gc.date_local}
                 <br />
                 Capacity: {gc.capacity}

@@ -12,7 +12,6 @@ export default function useAuth() {
     error,
   } = useContext(AuthContext);
 
-  // Convenient boolean getters
   const isAuthenticated = !!user;
   const isAdmin = !!(user && user.is_superuser);
   const isTrainer = !!(user && user.is_trainer);
