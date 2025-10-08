@@ -49,54 +49,75 @@ function Login() {
     setError('Google login error. (Popup closed?)');
   };
 
-  const googleAuth = GoogleLogin({
-    onSuccess: handleGoogleSuccess,
-    onError: handleGoogleError,
-  });
-
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <div className="login-icon">
-        <img src={require('../../images/logo.png')} alt="logo"></img>
-          <h2>Login</h2>
-        </div>
-        {error && <p className="error">{error}</p>}
+    <div className="auth-page accent-veil">
+      <div className="auth-card surface-card">
+        <div className="auth-layout">
+          <aside className="auth-side">
+            <div className="auth-side__content">
+              <span className="auth-badge">GymManagement</span>
+              <h2>Training made beautifully simple.</h2>
+              <p>
+                Plan sessions, monitor memberships, and keep the motivation high with a clear view of
+                everything that matters.
+              </p>
+              <ul>
+                <li>Instant access to upcoming classes</li>
+                <li>Membership renewals with one click</li>
+                <li>Personalized trainer collaboration</li>
+              </ul>
+            </div>
+          </aside>
 
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <input
-              type="text"
-              name="username"
-              placeholder="Email or Username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-            />
+          <div className="auth-content">
+            <div className="auth-header">
+              <span className="chip accent">Welcome back</span>
+              <h3>Log in to your account</h3>
+              <p className="muted-text">
+                Manage your classes, memberships, and trainer collaborations from a single dashboard.
+              </p>
+            </div>
+
+            {error && <p className="auth-error">{error}</p>}
+
+            <form onSubmit={handleSubmit} className="auth-form">
+              <label className="auth-field">
+                <span>Username or email</span>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  className="auth-input"
+                  autoComplete="username"
+                />
+              </label>
+              <label className="auth-field">
+                <span>Password</span>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="auth-input"
+                  autoComplete="current-password"
+                />
+              </label>
+
+              <button type="submit" className="btn-primary auth-submit">
+                Log in
+              </button>
+            </form>
+
+            <div className="auth-divider">
+              <span>or continue with</span>
+            </div>
+
+            <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
           </div>
-          <div className="input-group">
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <button type="submit" className="btn-green">
-            LOG IN
-          </button>
-        </form>
-
-        <div className="divider">
-          <span>or</span>
         </div>
-        <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-            />
       </div>
     </div>
   );

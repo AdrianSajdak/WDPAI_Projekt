@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../api/axiosClient';
-import '../styles/Home.css';
-import '../styles/AdminPanel.css'
+import '../styles/AdminPanel.css';
 
 function AdminPanel() {
   const [trainers, setTrainers] = useState([]);
@@ -157,15 +156,26 @@ function AdminPanel() {
   }
 
   return (
-    <div className="admin-container">
-      <div className='admin-box'>
-        <h2>Admin Panel</h2>
+    <div className="page section panel-page">
+      <div className="section-header page-header">
         <div>
-          <h3>Create Membership Plan</h3>
-          <form onSubmit={addMembershipPlan}>
-            <div className="input-group">
-              Plan Name:
+          <span className="chip accent">Admin tools</span>
+          <h2 className="section-title">Gym control center</h2>
+          <p className="section-subtitle">
+            Manage plans, classes, and trainers with a streamlined workspace.
+          </p>
+        </div>
+      </div>
+
+      <div className="panel-grid">
+        <section className="surface-card panel-card">
+          <h3>Create membership plan</h3>
+          <p className="panel-note">Define pricing and duration to make a new plan available instantly.</p>
+          <form onSubmit={addMembershipPlan} className="form-stacked">
+            <div className="form-field">
+              <label htmlFor="plan-name">Plan name</label>
               <input
+                id="plan-name"
                 type="text"
                 name="name"
                 value={planData.name}
@@ -174,18 +184,21 @@ function AdminPanel() {
               />
             </div>
 
-            <div className='input-group'>
-              Description:
-              <input
-                type="text"
+            <div className="form-field">
+              <label htmlFor="plan-description">Description</label>
+              <textarea
+                id="plan-description"
                 name="description"
+                rows={3}
                 value={planData.description}
                 onChange={handlePlanChange}
               />
             </div>
-            <div className='input-group'>
-              Price (monthly):
+
+            <div className="form-field">
+              <label htmlFor="plan-price">Price (PLN)</label>
               <input
+                id="plan-price"
                 type="number"
                 step="0.01"
                 name="price"
@@ -194,132 +207,172 @@ function AdminPanel() {
                 required
               />
             </div>
-            <div className='input-group'>
-              Duration (days):
+
+            <div className="form-field">
+              <label htmlFor="plan-duration">Duration (days)</label>
               <input
+                id="plan-duration"
                 type="number"
                 name="duration_days"
                 value={planData.duration_days}
                 onChange={handlePlanChange}
               />
             </div>
-            <button type="submit" className="btn-green">
-              Add Plan
-            </button>
-          </form>
-        </div>
 
-        <div>
-          <h3>Create Trainer</h3>
-          <form
-            onSubmit={addTrainer}
-          >
-            <div className='input-group'>
-              Select existing user:
+            <div className="form-actions">
+              <button type="submit" className="btn-primary">
+                Publish plan
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section className="surface-card panel-card">
+          <h3>Register trainer</h3>
+          <p className="panel-note">Convert an existing user into a trainer and optionally add a profile photo.</p>
+          <form onSubmit={addTrainer} className="form-stacked">
+            <div className="form-field">
+              <label htmlFor="select-trainer-user">User</label>
               <select
-                id="user_id"
+                id="select-trainer-user"
                 name="user_id"
                 value={trainerData.user_id}
                 onChange={handleTrainerChange}
                 required
               >
-                <option value="">-- select user --</option>
-                {allUsers.map(u => (
+                <option value="">Select user</option>
+                {allUsers.map((u) => (
                   <option key={u.id} value={u.id}>
                     {u.username} ({u.email})
                   </option>
                 ))}
               </select>
             </div>
-            <div className='input-group'>
-              Specialization:
+
+            <div className="form-field">
+              <label htmlFor="trainer-specialization">Specialization</label>
               <input
+                id="trainer-specialization"
                 type="text"
                 name="specialization"
                 value={trainerData.specialization}
                 onChange={handleTrainerChange}
               />
             </div>
-            <div className='input-group'>
-              Photo (optional):
+
+            <div className="form-field">
+              <label htmlFor="trainer-photo">Photo</label>
               <input
+                id="trainer-photo"
                 type="file"
                 name="photo"
                 accept="image/*"
                 onChange={handleTrainerChange}
               />
             </div>
-            <button type="submit" className="btn-green">
-              Add Trainer
-            </button>
-          </form>
-        </div>
 
-        <div>
-          <h3>Existing Trainers</h3>
-          <ul>
+            <div className="form-actions">
+              <button type="submit" className="btn-primary">
+                Add trainer
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <section className="surface-card panel-card">
+        <h3>Existing trainers</h3>
+        {trainers.length === 0 ? (
+          <div className="empty-state">
+            <h3>No trainers yet</h3>
+            <p className="muted-text">Create a trainer profile to assign classes and manage schedules.</p>
+          </div>
+        ) : (
+          <div className="panel-list">
             {trainers.map((tr) => (
-              <li key={tr.id}>
-                <strong>
-                  {tr.first_name} {tr.last_name}
-                </strong>
-                <br />
-                Specialization: {tr.specialization || 'N/A'}
-                <br />
+              <div className="panel-list-item" key={tr.id}>
+                <header>
+                  <h4>
+                    {tr.first_name} {tr.last_name}
+                  </h4>
+                  <button type="button" className="btn-danger" onClick={() => deleteTrainer(tr.id)}>
+                    Remove
+                  </button>
+                </header>
+                <p className="muted-text">{tr.specialization || 'No specialization provided'}</p>
                 {tr.photo && (
                   <img
                     src={tr.photo}
-                    alt="Trainer Photo"
-                    style={{ width: '100px', height: 'auto' }}
+                    alt={`${tr.first_name} ${tr.last_name}`}
+                    style={{ width: '120px', borderRadius: '12px' }}
                   />
                 )}
-                <br />
-                <button onClick={() => deleteTrainer(tr.id)}>Delete</button>
-              </li>
+              </div>
             ))}
-          </ul>
-        </div>
+          </div>
+        )}
+      </section>
 
-        <div>
-          <h3>Membership Plans</h3>
-          <ul>
+      <section className="surface-card panel-card">
+        <h3>Membership plans</h3>
+        {plans.length === 0 ? (
+          <div className="empty-state">
+            <h3>No plans published</h3>
+            <p className="muted-text">Create your first membership plan to begin onboarding members.</p>
+          </div>
+        ) : (
+          <div className="panel-list">
             {plans.map((pl) => (
-              <li key={pl.id}>
-                <strong>{pl.name}</strong> – {pl.price} PLN
-                <br />
-                {pl.description}
-                <br />
-                <button onClick={() => deletePlan(pl.id)}>Delete</button>
-              </li>
+              <div className="panel-list-item" key={pl.id}>
+                <header>
+                  <h4>{pl.name}</h4>
+                  <button type="button" className="btn-danger" onClick={() => deletePlan(pl.id)}>
+                    Delete
+                  </button>
+                </header>
+                <div className="muted-text" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                  <span>
+                    <strong>Price:</strong> {pl.price} PLN
+                  </span>
+                  <span>
+                    <strong>Duration:</strong> {pl.duration_days} days
+                  </span>
+                </div>
+                <p className="muted-text">{pl.description || 'No description provided.'}</p>
+              </div>
             ))}
-          </ul>
-        </div>
+          </div>
+        )}
+      </section>
 
-        <div>
-          <h3>All Classes</h3>
-          <ul>
+      <section className="surface-card panel-card">
+        <h3>All classes</h3>
+        {groupClasses.length === 0 ? (
+          <div className="empty-state">
+            <h3>No classes available</h3>
+            <p className="muted-text">Trainers can create new classes from their panel.</p>
+          </div>
+        ) : (
+          <div className="panel-list">
             {groupClasses.map((gc) => (
-              <li key={gc.id}>
-                <strong>{gc.name}</strong>
-                <br />
-                Trainer: {gc.trainer_name}
-                <br />
-                Date: {gc.date_local}
-                <br />
-                Capacity: {gc.capacity}
-                <br />
-                <button onClick={() => deleteClass(gc.id)}>Delete Class</button>
-              </li>
+              <div className="panel-list-item" key={gc.id}>
+                <header>
+                  <h4>{gc.name}</h4>
+                  <button type="button" className="btn-danger" onClick={() => deleteClass(gc.id)}>
+                    Delete class
+                  </button>
+                </header>
+                <div className="muted-text" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                  <span>Trainer: {gc.trainer_name}</span>
+                  <span>Date: {gc.date_local}</span>
+                  <span>Capacity: {gc.capacity}</span>
+                </div>
+              </div>
             ))}
-          </ul>
-        </div>
-
-      </div >
-    </div >
-
-
-
-
+          </div>
+        )}
+      </section>
+    </div>
   );
 }
 

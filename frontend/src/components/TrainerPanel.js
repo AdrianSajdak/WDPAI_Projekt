@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../api/axiosClient';
 import useAuth from '../hooks/useAuth';
-import '../styles/Home.css';
-import '../styles/TrainerPanel.css'
+import '../styles/TrainerPanel.css';
 
 
 function TrainerPanel() {
@@ -20,15 +19,21 @@ function TrainerPanel() {
   });
 
   useEffect(() => {
-    fetchMyClasses();
     fetchAllUsers();
   }, []);
+
+  useEffect(() => {
+    fetchMyClasses();
+  }, [user]);
 
   const fetchMyClasses = async () => {
     try {
       const res = await axiosClient.get('/classes/');
-
-      const trainerClasses = res.data.filter(gc => gc.trainer === user.id);
+      if (!user) {
+        setMyClasses([]);
+        return;
+      }
+      const trainerClasses = res.data.filter((gc) => gc.trainer === user.id);
       setMyClasses(trainerClasses);
     } catch (err) {
       console.error(err);
@@ -104,21 +109,30 @@ function TrainerPanel() {
     }
   };
 
-  return (
-    <div className='trainer-container'>
-      <div className='trainer-box'>
-      <h2>Trainer Panel</h2>
-      <p>Hello, {user?.username}! Create and manage your classes here.</p>
+  if (!user) {
+    return <p className="muted-text">Loading trainer profile…</p>;
+  }
 
-      <div>
-        <h3>Create a New Class</h3>
-        <form
-          onSubmit={createClass}
-        >
-          <div className="input-group">
-            Class Name:
-            <br />
+  return (
+    <div className="page section panel-page">
+      <div className="section-header page-header">
+        <div>
+          <span className="chip accent">Trainer workspace</span>
+          <h2 className="section-title">Design impactful sessions</h2>
+          <p className="section-subtitle">
+            Create new classes and maintain your schedule in one streamlined view.
+          </p>
+        </div>
+      </div>
+
+      <section className="surface-card panel-card">
+        <h3>Create a class</h3>
+        <p className="panel-note">Describe your session, set the capacity, and choose if it&apos;s group-based or individual.</p>
+        <form onSubmit={createClass} className="form-stacked">
+          <div className="form-field">
+            <label htmlFor="class-name">Class name</label>
             <input
+              id="class-name"
               type="text"
               name="name"
               value={formData.name}
@@ -126,20 +140,22 @@ function TrainerPanel() {
               required
             />
           </div>
-          <br />
-          <div className='input-group'>
-            Description:
-            <input
-              type="text"
+
+          <div className="form-field">
+            <label htmlFor="class-description">Description</label>
+            <textarea
+              id="class-description"
               name="description"
+              rows={3}
               value={formData.description}
               onChange={handleChange}
             />
           </div>
-          <br />
-          <div className='input-group'>
-            Date & Time:
+
+          <div className="form-field">
+            <label htmlFor="class-date">Date &amp; time</label>
             <input
+              id="class-date"
               type="datetime-local"
               name="date_time"
               value={formData.date_time}
@@ -147,8 +163,11 @@ function TrainerPanel() {
               required
             />
           </div>
-          <div className='input-group'>
+
+          <div className="form-field">
+            <label htmlFor="class-type">Class type</label>
             <select
+              id="class-type"
               name="class_type"
               value={formData.class_type}
               onChange={handleChange}
@@ -157,26 +176,29 @@ function TrainerPanel() {
               <option value="individual">Individual</option>
             </select>
           </div>
+
           {formData.class_type === 'group' ? (
-            <div className='input-group'>
-              Capacity:
+            <div className="form-field">
+              <label htmlFor="class-capacity">Capacity</label>
               <input
+                id="class-capacity"
                 type="number"
                 name="capacity"
                 value={formData.capacity}
                 onChange={handleChange}
+                min={1}
               />
             </div>
           ) : (
-            <div className='input-group'>
-              Select User (for 1-on-1):
-              <br />
+            <div className="form-field">
+              <label htmlFor="class-user">Select user (1-on-1)</label>
               <select
+                id="class-user"
                 name="selected_user"
                 value={formData.selected_user}
                 onChange={handleChange}
               >
-                <option value="">-- choose user --</option>
+                <option value="">Choose user</option>
                 {allUsers.map((u) => (
                   <option key={u.id} value={u.id}>
                     {u.username} ({u.email})
@@ -185,40 +207,44 @@ function TrainerPanel() {
               </select>
             </div>
           )}
-          <button
-            type="submit"
-            className="btn-green"
-          >
-            Create Class
-          </button>
-        </form>
-      </div>
 
-      <div>
-        <h3>My Created Classes</h3>
+          <div className="form-actions">
+            <button type="submit" className="btn-primary">
+              Publish class
+            </button>
+            <button type="button" className="btn-ghost" onClick={resetForm}>
+              Reset form
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section className="surface-card panel-card">
+        <h3>My created classes</h3>
         {myClasses.length === 0 ? (
-          <p>You have not created any classes yet.</p>
+          <div className="empty-state">
+            <h3>No classes yet</h3>
+            <p className="muted-text">Create your first class to invite members or schedule private sessions.</p>
+          </div>
         ) : (
-          <ul>
+          <div className="panel-list">
             {myClasses.map((gc) => (
-              <li key={gc.id}>
-                <strong>{gc.name}</strong>
-                <br />
-                Trainer: {gc.trainer_name}
-                <br />
-                {gc.date_local}
-                <br />
-                Capacity: {gc.capacity}
-                <br />
-                <button onClick={() => handleDeleteClass(gc.id)}>
-                  Delete
-                </button>
-              </li>
+              <div className="panel-list-item" key={gc.id}>
+                <header>
+                  <h4>{gc.name}</h4>
+                  <button type="button" className="btn-danger" onClick={() => handleDeleteClass(gc.id)}>
+                    Delete
+                  </button>
+                </header>
+                <div className="muted-text" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                  <span>Date: {gc.date_local}</span>
+                  <span>Capacity: {gc.capacity}</span>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
-      </div>
-      </div>
+      </section>
     </div>
   );
 }

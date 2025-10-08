@@ -25,9 +25,9 @@ const GOOGLE_CLIENT_ID = '666492394731-iq3kv2qhapqrcl1sd9cn3tier6rggmcd.apps.goo
 function App() {
   return (
   <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-    <div id="root">
+    <div className="app-shell">
       <Navbar />
-      <div className="main-content">
+      <main className="app-main">
         <Routes>
           <Route path="/" element={<Home />} />
 
@@ -88,7 +88,7 @@ function App() {
           />
 
         </Routes>
-      </div>
+      </main>
       <Footer />
     </div>
   </GoogleOAuthProvider>

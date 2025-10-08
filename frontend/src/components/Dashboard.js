@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosClient from '../api/axiosClient';
 import useAuth from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
-import '../styles/Home.css';
-import '../styles/Login.css'
-
+import '../styles/Dashboard.css';
 
 function Dashboard() {
   const { user } = useAuth();
@@ -12,6 +10,8 @@ function Dashboard() {
   const [myClasses, setMyClasses] = useState([]);
 
   useEffect(() => {
+    if (!user) return;
+
     const fetchMyMemberships = async () => {
       try {
         const res = await axiosClient.get('/memberships/');
@@ -20,84 +20,137 @@ function Dashboard() {
         console.error(err);
       }
     };
-  
+
     const fetchMyClasses = async () => {
       try {
         const res = await axiosClient.get('/classes/');
-        if (!user) return;
-        const userClasses = res.data.filter((c) =>
-          c.attendees.includes(user.id)
-        );
+        const userClasses = res.data.filter((c) => c.attendees.includes(user.id));
         setMyClasses(userClasses);
       } catch (err) {
         console.error(err);
       }
     };
-  
+
     const fetchAll = async () => {
-      await fetchMyMemberships();
-      await fetchMyClasses();
+      await Promise.all([fetchMyMemberships(), fetchMyClasses()]);
     };
+
     fetchAll();
   }, [user]);
 
+  if (!user) {
+    return <p className="muted-text">Loading user details…</p>;
+  }
+
+  const activeMemberships = myMemberships.filter((m) => m.is_active);
+
   return (
-    <div>
-      <h2>User Dashboard</h2>
-      {user ? (
-        <>
-          <p>Hello, {user.username}!</p>
+    <div className="page section dashboard">
+      <div className="section-header page-header">
+        <div>
+          <h2 className="section-title">Welcome back, {user.username}</h2>
+          <p className="section-subtitle">
+            Track your upcoming classes and current memberships at a glance.
+          </p>
+        </div>
+        <Link to="/all-classes" className="btn-primary">
+          Explore classes
+        </Link>
+      </div>
 
-          <section>
-            <h3>My Memberships</h3>
-            {myMemberships.length === 0 ? (
-              <p>No memberships.</p>
-            ) : (
-              <ul>
-                {myMemberships.map((m) => (
-                  <li key={m.id} >
-                    <strong>Plan:</strong> {m.plan_name} <br />
-                    <strong>From:</strong> {m.start_date} - <strong>To:</strong> {m.end_date}                    
-                    {m.is_active ? (
-                      <span style={{ color: 'green' }}>(Active)</span>
-                    ) : (
-                      <span style={{ color: 'red' }}>(Inactive)</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+      <div className="dashboard-metrics">
+        <div className="metric-card">
+          <span>Active memberships</span>
+          <strong>{activeMemberships.length}</strong>
+        </div>
+        <div className="metric-card">
+          <span>Upcoming classes</span>
+          <strong>{myClasses.length}</strong>
+        </div>
+      </div>
 
-          <section>
-  <h3>My Classes</h3>
-  {myClasses.length === 0 ? (
-    <p>You are not enrolled in any classes.</p>
-  ) : (
-    <ul>
-      {myClasses.map((gc) => (
-        <li key={gc.id}>
-          <strong>{gc.name}</strong>
-          <br />
-          Trainer: {gc.trainer_name}
-          <br />
-          Date: {gc.date_local}
-          <br />
-          Capacity: {gc.capacity}
-        </li>
-      ))}
-    </ul>
-  )}
-</section>
+      <div className="page-columns">
+        <section className="surface-card">
+          <div className="section-header" style={{ marginBottom: '1.2rem' }}>
+            <div>
+              <h3 className="section-title" style={{ fontSize: '1.45rem' }}>
+                My memberships
+              </h3>
+              <p className="muted-text">
+                Renew or extend plans from the membership page.
+              </p>
+            </div>
+          </div>
 
+          {myMemberships.length === 0 ? (
+            <div className="empty-state">
+              <h3>No memberships yet</h3>
+              <p className="muted-text">
+                Activate your first plan to unlock classes and trainer support.
+              </p>
+              <Link to="/membership-plans" className="btn-primary" style={{ marginTop: '1rem' }}>
+                Browse plans
+              </Link>
+            </div>
+          ) : (
+            <ul className="list-plain">
+              {myMemberships.map((m) => (
+                <li className="list-item" key={m.id}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+                    <h4>{m.plan_name}</h4>
+                    <span className={`status-pill ${m.is_active ? 'success' : 'danger'}`}>
+                      {m.is_active ? 'Active' : 'Expired'}
+                    </span>
+                  </div>
+                  <div className="muted-text" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                    <span>
+                      <strong>Start:</strong> {m.start_date}
+                    </span>
+                    <span>
+                      <strong>End:</strong> {m.end_date || 'No end date'}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
-          <Link to="/all-classes" className="btn">
-            View All Classes
-          </Link>
-        </>
-      ) : (
-        <p>You are not logged in.</p>
-      )}
+        <section className="surface-card">
+          <div className="section-header" style={{ marginBottom: '1.2rem' }}>
+            <div>
+              <h3 className="section-title" style={{ fontSize: '1.45rem' }}>
+                My upcoming classes
+              </h3>
+              <p className="muted-text">
+                Manage your attendance and stay on top of your training schedule.
+              </p>
+            </div>
+          </div>
+
+          {myClasses.length === 0 ? (
+            <div className="empty-state">
+              <h3>No classes booked</h3>
+              <p className="muted-text">
+                Reserve a spot in group classes to keep your progress moving.
+              </p>
+            </div>
+          ) : (
+            <ul className="list-plain">
+              {myClasses.map((gc) => (
+                <li className="list-item" key={gc.id}>
+                  <h4>{gc.name}</h4>
+                  <div className="muted-text" style={{ display: 'grid', gap: '0.35rem' }}>
+                    <span>Trainer: {gc.trainer_name}</span>
+                    <span>Date: {gc.date_local}</span>
+                    <span>Capacity: {gc.capacity}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
     </div>
   );
 }
